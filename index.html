@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Alphaville Otr",
+  "schemaVersion": 1,
+  "description": "Painel exclusivo do projeto Casa Alphaville — OTR Engenharia. Financiamento CEF PF (terreno + construção), rastreador de fases, programação de desembolso, checklist de execução e viabilidade."
+}
+</script>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alphaville Q15 L03 — OTR</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root{--bg:#0f1117;--sur:#1a1d27;--sur2:#22263a;--bd:#2d3148;--acc:#5b6af7;--acc2:#7c8bff;--grn:#22c55e;--ylw:#f59e0b;--red:#ef4444;--org:#f97316;--txt:#e2e8f0;--mut:#8892a4;--r:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;min-height:100vh}
+.hdr{background:linear-gradient(135deg,#1a1d27,#0f1117);border-bottom:1px solid var(--bd);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hdr h1{font-size:16px;font-weight:700;color:#fff}.hdr p{font-size:11px;color:var(--mut);margin-top:2px}
+.badge{background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;animation:pulse 1.5s infinite;white-space:nowrap}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.03)}}
+.tabs{display:flex;gap:2px;padding:10px 20px 0;background:var(--bg);border-bottom:1px solid var(--bd);overflow-x:auto}
+.tab{padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;color:var(--mut);border-radius:6px 6px 0 0;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.tab:hover{color:var(--txt);background:var(--sur)}.tab.active{color:var(--acc2);border-bottom-color:var(--acc2);background:var(--sur)}
+.content{padding:16px 20px}.panel{display:none}.panel.active{display:block}
+.alert{border-radius:var(--r);padding:12px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
+.alert-red{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35)}
+.alert-ylw{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)}
+.alert-grn{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)}
+.alert-blu{background:rgba(91,106,247,.1);border:1px solid rgba(91,106,247,.3)}
+.alert-icon{font-size:18px;flex-shrink:0}.alert-title{font-weight:700;font-size:12px;margin-bottom:2px}
+.alert-red .alert-title{color:var(--red)}.alert-ylw .alert-title{color:var(--ylw)}.alert-grn .alert-title{color:var(--grn)}.alert-blu .alert-title{color:var(--acc2)}
+.alert-body{font-size:11px;color:var(--mut);line-height:1.5}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px}
+.kpi-lbl{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi-val{font-size:18px;font-weight:700;color:#fff}.kpi-sub{font-size:10px;color:var(--mut);margin-top:2px}
+.kpi-grn .kpi-val{color:var(--grn)}.kpi-ylw .kpi-val{color:var(--ylw)}.kpi-red .kpi-val{color:var(--red)}.kpi-blu .kpi-val{color:var(--acc2)}.kpi-org .kpi-val{color:var(--org)}
+.sec{margin-bottom:16px}.sec-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mut);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--sur2);color:var(--mut);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--bd)}
+td{padding:7px 10px;border-bottom:1px solid rgba(45,49,72,.5);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
+.tag-grn{background:rgba(34,197,94,.15);color:var(--grn)}.tag-ylw{background:rgba(245,158,11,.15);color:var(--ylw)}
+.tag-red{background:rgba(239,68,68,.15);color:var(--red)}.tag-blu{background:rgba(91,106,247,.15);color:var(--acc2)}
+.tag-org{background:rgba(249,115,22,.15);color:var(--org)}.tag-gray{background:rgba(136,146,164,.15);color:var(--mut)}
+.fase-tracker{display:flex;flex-direction:column;gap:8px}
+.fase{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:12px}
+.fase.done{border-left:3px solid var(--grn)}.fase.active{border-left:3px solid var(--ylw);background:rgba(245,158,11,.04)}.fase.pending{border-left:3px solid var(--bd);opacity:.65}
+.fase-name{font-weight:600;font-size:12px}.fase-desc{font-size:11px;color:var(--mut);margin-top:2px}
+.fase-date{font-size:10px;color:var(--mut);margin-left:auto;white-space:nowrap}
+.cbox{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.cbox-hdr{background:var(--sur2);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.cbox-hdr-l{font-weight:700;font-size:12px;display:flex;align-items:center;gap:8px}
+.cbox-body{padding:6px 0}
+.citem{padding:7px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.citem:hover{background:rgba(91,106,247,.06)}
+.cb{width:15px;height:15px;border-radius:3px;border:2px solid var(--bd);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.cb.checked{background:var(--grn);border-color:var(--grn)}.cb.checked::after{content:'✓';color:#fff;font-size:9px;font-weight:700}
+.ctext{font-size:12px;line-height:1.4}.csub{font-size:10px;color:var(--mut);margin-top:1px}
+.vrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(45,49,72,.4);font-size:12px}
+.vrow:last-child{border-bottom:none}
+.vrow.total{font-weight:700;color:#fff;padding-top:10px;margin-top:4px;border-top:1px solid var(--bd);border-bottom:none;font-size:13px}
+.vrow.lucro{color:var(--grn);font-weight:700}
+.card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:14px}
+.prog-bar{background:var(--sur2);border-radius:4px;height:6px;margin-top:6px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.note{background:var(--sur);border:1px solid var(--bd);border-left:3px solid var(--acc);border-radius:var(--r);padding:10px 14px;font-size:12px;line-height:1.6;margin-bottom:8px}
+.filter-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-btn{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid var(--bd);background:var(--sur);color:var(--mut);transition:all .15s}
+.filter-btn:hover{color:var(--txt);border-color:var(--acc)}
+.filter-btn.f-all.active{background:rgba(91,106,247,.15);border-color:var(--acc2);color:var(--acc2)}
+.filter-btn.f-prop.active{background:rgba(249,115,22,.15);border-color:var(--org);color:var(--org)}
+.filter-btn.f-cef.active{background:rgba(91,106,247,.15);border-color:var(--acc2);color:var(--acc2)}
+.chart-wrap{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:14px}
+canvas{max-height:300px}
+.detalhe-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid rgba(45,49,72,.4)}
+.detalhe-item:last-child{border-bottom:none}
+.d-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.d-prop{background:var(--org)}.d-cef{background:var(--acc2)}
+.d-desc{flex:1;font-size:12px}.d-sub{font-size:10px;color:var(--mut)}
+.d-val{font-size:12px;font-weight:600;white-space:nowrap}
+.d-quando{font-size:10px;color:var(--mut);white-space:nowrap;margin-left:8px}
+.phase-section{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.phase-hdr{background:var(--sur2);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:8px}
+.phase-hdr-l{font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
+.phase-hdr-r{display:flex;gap:8px;align-items:center;font-size:11px}
+.phase-body{padding:4px 0}
+.sem-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sem-i{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:8px;flex:1;min-width:160px}
+.sem-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sem-grn{background:var(--grn)}.sem-ylw{background:var(--ylw)}
+.pcard{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:14px}
+.pcard h3{font-size:12px;font-weight:700;margin-bottom:4px}
+.pcard .role{font-size:10px;color:var(--mut);margin-bottom:8px}
+.pcard .info{font-size:11px;line-height:1.6}
+.sc-card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px}
+.sc-name{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--mut);margin-bottom:4px}
+.sc-price{font-size:15px;font-weight:700;color:#fff}
+.sc-margin{font-size:11px;margin-top:2px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:700px){.grid4{grid-template-columns:repeat(2,1fr)}}
+/* ORÇAMENTO TABLE */
+.orc-section{margin-bottom:12px}
+.orc-cat{background:var(--sur2);padding:8px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);display:flex;align-items:center;justify-content:space-between;border-radius:var(--r) var(--r) 0 0;border:1px solid var(--bd);border-bottom:none}
+.orc-table{border:1px solid var(--bd);border-radius:0 0 var(--r) var(--r);overflow:hidden}
+.orc-table table{width:100%;border-collapse:collapse;font-size:12px}
+.orc-table th{background:rgba(34,37,58,.8);color:var(--mut);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:7px 12px;text-align:right;border-bottom:1px solid var(--bd)}
+.orc-table th:first-child{text-align:left}
+.orc-table td{padding:8px 12px;border-bottom:1px solid rgba(45,49,72,.4);text-align:right;vertical-align:middle}
+.orc-table td:first-child{text-align:left}
+.orc-table tr:last-child td{border-bottom:none}
+.orc-table tr.row-grn td{background:rgba(34,197,94,.04)}
+.orc-table tr.row-red td{background:rgba(239,68,68,.04)}
+.orc-table tr.row-total{background:rgba(91,106,247,.07)}
+.orc-table tr.row-total td{font-weight:700;border-top:1px solid var(--bd)}
+.delta-grn{color:var(--grn);font-weight:600}
+.delta-red{color:var(--red);font-weight:600}
+.delta-neu{color:var(--mut)}
+.val-real{color:var(--grn);font-weight:600}
+.val-empty{color:var(--mut);font-style:italic}
+.bar-mini{height:4px;border-radius:2px;margin-top:4px;background:var(--sur2);overflow:hidden;min-width:60px}
+.bar-fill-grn{height:100%;background:var(--grn);border-radius:2px}
+.bar-fill-red{height:100%;background:var(--red);border-radius:2px}
+.orc-obs{font-size:10px;color:var(--mut);margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>🏠 Casa Alphaville IV — Q15 L03</h1>
+    <p>OTR Engenharia · Rua Agave · 375m² · Mat. 244.050 · Campo Grande/MS</p>
+  </div>
+  <div class="badge">⚠️ Protocolo CEF — Até 12/05/2026</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="setTab('visao',this)">Visão Geral</div>
+  <div class="tab" onclick="setTab('contrato',this)">Contrato & Prazos</div>
+  <div class="tab" onclick="setTab('desembolso',this)">Desembolso</div>
+  <div class="tab" onclick="setTab('orcamento',this)">Orçamento vs Real</div>
+  <div class="tab" onclick="setTab('checklist',this)">Checklist</div>
+  <div class="tab" onclick="setTab('viabilidade',this)">Viabilidade</div>
+  <div class="tab" onclick="setTab('parceiros',this)">Parceiros</div>
+</div>
+
+<div class="content">
+
+<!-- VISÃO GERAL -->
+<div class="panel active" id="panel-visao">
+  <div class="alert alert-red">
+    <div class="alert-icon">🚨</div>
+    <div>
+      <div class="alert-title">AÇÃO URGENTE — Protocolar CEF até 12/05/2026</div>
+      <div class="alert-body">Contrato assinado 28/04/2026. Prazo: 10 dias úteis. Sinal R$10.000 pago. Aprovação de crédito CPF já solicitada. Não protocolar = risco de perda do sinal (cláusula 3.3).</div>
+    </div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-lbl">Terreno</div><div class="kpi-val">375m²</div><div class="kpi-sub">Q15 L03 · R$400k</div></div>
+    <div class="kpi"><div class="kpi-lbl">Área Construída</div><div class="kpi-val">187,5m²</div><div class="kpi-sub">Padrão alto · 3Q 2B 2G</div></div>
+    <div class="kpi kpi-blu"><div class="kpi-lbl">VGV</div><div class="kpi-val">R$2,0M</div><div class="kpi-sub">R$10.667/m²</div></div>
+    <div class="kpi kpi-grn"><div class="kpi-lbl">Margem Bruta</div><div class="kpi-val">24,1%</div><div class="kpi-sub">ROI: 31,7%</div></div>
+    <div class="kpi kpi-grn"><div class="kpi-lbl">Lucro Bruto</div><div class="kpi-val">R$481k</div><div class="kpi-sub">Cenário base</div></div>
+    <div class="kpi kpi-ylw"><div class="kpi-lbl">Prazo Obra</div><div class="kpi-val">18 meses</div><div class="kpi-sub">Após aprovação CEF</div></div>
+    <div class="kpi kpi-blu"><div class="kpi-lbl">Financiamento CEF</div><div class="kpi-val">R$1,6M</div><div class="kpi-sub">80% · 30 anos · SBPE</div></div>
+    <div class="kpi kpi-grn"><div class="kpi-lbl">Economia Projetos</div><div class="kpi-val">R$10.563</div><div class="kpi-sub">Cotações recebidas</div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl">Rastreador de Fases</div>
+    <div class="fase-tracker">
+      <div class="fase done"><div style="font-size:16px">✅</div><div><div class="fase-name">Contrato de Compra e Venda Assinado</div><div class="fase-desc">Sinal R$10.000 pago · Roberto Torres Neto</div></div><div class="fase-date">28/04/2026</div></div>
+      <div class="fase done"><div style="font-size:16px">✅</div><div><div class="fase-name">Aprovação de Crédito CPF Solicitada</div><div class="fase-desc">CPF Gabriel Acioly · Aguardando retorno CEF</div></div><div class="fase-date">Em andamento</div></div>
+      <div class="fase active"><div style="font-size:16px">⏳</div><div><div class="fase-name">Protocolo do Financiamento na CEF</div><div class="fase-desc">10 dias úteis · Documentação PF completa + projetos</div></div><div class="fase-date" style="color:var(--red)">⚠️ 12/05/2026</div></div>
+      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Laudo de Avaliação CEF</div><div class="fase-desc">Vistoria técnica · Imóvel avaliado R$2.000.000</div></div><div class="fase-date">Após protocolo</div></div>
+      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Aprovação + Escritura + Liberação Terreno</div><div class="fase-desc">Prazo contratual 90 dias · CEF libera R$390.000 para vendedor</div></div><div class="fase-date">Até 27/07/2026</div></div>
+      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Início da Obra + PCI Aprovada</div><div class="fase-desc">Alvará + aprovação Alphaville CG4 + contrato empreiteiro</div></div><div class="fase-date">Q3 2026</div></div>
+      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Medições e Liberações CEF — 6 etapas</div><div class="fase-desc">R$843.750 liberados conforme % físico da obra</div></div><div class="fase-date">18 meses</div></div>
+      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Habite-se + Averbação + Entrega</div><div class="fase-desc">Registro cartório · Liberação final CEF</div></div><div class="fase-date">Q1 2028</div></div>
+    </div>
+  </div>
+  <div class="note">💡 <strong>Condição suspensiva:</strong> O CCV é condicional à aprovação do financiamento CEF em até 90 dias. Se negado, sinal devolvido. Prioridade máxima: protocolar antes de 12/05/2026.</div>
+</div>
+
+<!-- CONTRATO & PRAZOS -->
+<div class="panel" id="panel-contrato">
+  <div class="sec"><div class="sec-ttl">Dados do Imóvel</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="vrow"><span style="color:var(--mut)">Empreendimento</span><span><strong>Alphaville Residence 4</strong></span></div>
+        <div class="vrow"><span style="color:var(--mut)">Endereço</span><span>Rua Agave, Q15 L03</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Matrícula</span><span>244.050 · CRI Campo Grande</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Área do Terreno</span><span>375 m²</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Topografia</span><span>Plano</span></div>
+      </div>
+      <div class="card">
+        <div class="vrow"><span style="color:var(--mut)">Preço total</span><span><strong>R$400.000</strong></span></div>
+        <div class="vrow"><span style="color:var(--mut)">Sinal pago</span><span class="tag tag-grn">R$10.000 ✓ 28/04/2026</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Saldo devedor</span><span>R$390.000 (via CEF)</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Modalidade</span><span>Terreno + Construção SBPE PF</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Cônjuge anuente</span><span>Sofia Hilgert Acioly</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec"><div class="sec-ttl">Prazos Contratuais</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Prazo</th><th>Período</th><th>Data Limite</th><th>Consequência</th></tr></thead>
+      <tbody>
+        <tr><td>Protocolo do financiamento na CEF</td><td>10 dias úteis</td><td style="color:var(--red);font-weight:700">12/05/2026</td><td>Perda do sinal R$10.000</td></tr>
+        <tr><td>Aprovação do financiamento CEF</td><td>90 dias corridos</td><td>27/07/2026</td><td>Devolução do sinal se negado</td></tr>
+        <tr><td>Prazo de obras</td><td>18 meses</td><td>~Q1 2028</td><td>Multa R$40.000 por descumprimento</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="sec"><div class="sec-ttl">Cláusulas Relevantes</div>
+    <div class="grid2">
+      <div class="note">⚠️ <strong>Cláusula 3.3:</strong> Não protocolar no prazo = vendedor pode rescindir retendo o sinal R$10.000.</div>
+      <div class="note">📋 <strong>Cláusula 6.3:</strong> Comprador pode acessar o lote para vistoria mediante autorização prévia.</div>
+      <div class="note">🏘️ <strong>Alphaville CG4:</strong> Mensalidade condominial R$351,25/mês a partir da escrituração.</div>
+      <div class="note">💰 <strong>Corretor:</strong> Comissão R$20.000 — responsabilidade dos vendedores.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DESEMBOLSO -->
+<div class="panel" id="panel-desembolso">
+  <div class="alert alert-ylw">
+    <div class="alert-icon">💰</div>
+    <div>
+      <div class="alert-title">Desembolso Real: Recursos Próprios vs. Financiamento CEF</div>
+      <div class="alert-body">Próprio = caixa OTR/Gabriel (~R$118k). CEF = liberações por medição. Buffer disponível no limite R$1,6M: R$366.250.</div>
+    </div>
+  </div>
+  <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">
+    <div class="kpi kpi-org"><div class="kpi-lbl">💼 Recursos Próprios</div><div class="kpi-val">R$117.698</div><div class="kpi-sub">7,2% do custo total</div></div>
+    <div class="kpi kpi-blu"><div class="kpi-lbl">🏦 Via CEF (Previsto)</div><div class="kpi-val">R$1.233.750</div><div class="kpi-sub">Terreno + 6 liberações</div></div>
+    <div class="kpi"><div class="kpi-lbl">📊 Total Custo Direto</div><div class="kpi-val">R$1.351.448</div><div class="kpi-sub">Sem impostos e comissão</div></div>
+    <div class="kpi kpi-grn"><div class="kpi-lbl">🏦 Buffer CEF</div><div class="kpi-val">R$366.250</div><div class="kpi-sub">Disponível no limite</div></div>
+  </div>
+  <div class="filter-row">
+    <button class="filter-btn f-all active" onclick="setFilter('all',this)">● Todos</button>
+    <button class="filter-btn f-prop" onclick="setFilter('prop',this)">🟠 Recursos Próprios</button>
+    <button class="filter-btn f-cef" onclick="setFilter('cef',this)">🔵 Via CEF</button>
+  </div>
+  <div class="chart-wrap">
+    <div style="font-size:11px;color:var(--mut);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Desembolso por Fase — Próprio vs CEF (R$)</div>
+    <canvas id="chartDesembolso"></canvas>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl">Detalhamento por Fase</div>
+    <div id="fase-container"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl">Liberações CEF — 6 Medições</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Liberação</th><th>Gatilho Físico</th><th>%</th><th>Valor</th><th>Mês</th></tr></thead>
+      <tbody>
+        <tr><td><strong>L0</strong></td><td>Escritura / aprovação CEF</td><td>—</td><td style="color:var(--acc2)"><strong>R$390.000</strong></td><td>Aprovação</td></tr>
+        <tr><td><strong>L1</strong></td><td>Fundação concluída</td><td>10%</td><td style="color:var(--acc2)"><strong>R$84.375</strong></td><td>M3</td></tr>
+        <tr><td><strong>L2</strong></td><td>Estrutura concluída</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M6</td></tr>
+        <tr><td><strong>L3</strong></td><td>Alvenaria concluída</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M8</td></tr>
+        <tr><td><strong>L4</strong></td><td>Cobertura concluída</td><td>15%</td><td style="color:var(--acc2)"><strong>R$126.563</strong></td><td>M10</td></tr>
+        <tr><td><strong>L5</strong></td><td>Instalações concluídas</td><td>15%</td><td style="color:var(--acc2)"><strong>R$126.563</strong></td><td>M12</td></tr>
+        <tr><td><strong>L6</strong></td><td>Acabamentos + Habite-se</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M18</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="note">⚠️ Juros de obra (~R$127.849 total durante 18 meses) estão dentro do buffer de R$366.250 — incorporados ao saldo devedor, não impactam o caixa diretamente.</div>
+</div>
+
+<!-- ORÇAMENTO VS REAL -->
+<div class="panel" id="panel-orcamento">
+
+  <div class="alert alert-grn">
+    <div class="alert-icon">📊</div>
+    <div>
+      <div class="alert-title">Orçamento vs Cotação vs Real — Custos Indiretos e Diretos</div>
+      <div class="alert-body">Orçado = referência da planilha Viabilidade_Alpha_4. Cotado = proposta recebida. Real = valor efetivamente pago. Cotações de projetos resultam em <strong>economia líquida de R$10.563</strong> vs orçamento.</div>
+    </div>
+  </div>
+
+  <!-- KPIs COTAÇÕES -->
+  <div class="kpi-grid" id="orc-kpis"></div>
+
+  <!-- FILTRO CATEGORIA -->
+  <div class="filter-row" id="orc-filter-row">
+    <button class="filter-btn f-all active" onclick="orcFilter('all',this)">Todos</button>
+    <button class="filter-btn" onclick="orcFilter('projetos',this)">Projetos</button>
+    <button class="filter-btn" onclick="orcFilter('terreno',this)">Terreno</button>
+    <button class="filter-btn" onclick="orcFilter('obra',this)">Obra</button>
+    <button class="filter-btn" onclick="orcFilter('taxas',this)">Taxas e Encargos</button>
+  </div>
+
+  <!-- LEGENDA -->
+  <div style="display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;font-size:11px;color:var(--mut)">
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,.2);display:inline-block;border:1px solid rgba(34,197,94,.4)"></span> Cotação abaixo do orçamento</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,.12);display:inline-block;border:1px solid rgba(239,68,68,.3)"></span> Cotação acima do orçamento</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,.15);display:inline-block;border:1px solid rgba(34,197,94,.3)"></span> Valor confirmado / pago</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--sur2);display:inline-block;border:1px solid var(--bd)"></span> Sem cotação ainda</span>
+  </div>
+
+  <div id="orc-tables"></div>
+
+  <div class="note" style="margin-top:14px">💡 <strong>Projetos (cotações recebidas):</strong> Arquitetônico: orçado R$30.000 → cotado R$18.000 (<span style="color:var(--grn)">−R$12.000</span>). Estrutural+Hidr+Elét: orçado R$7.000 → cotado R$8.437,50 (<span style="color:var(--red)">+R$1.437,50</span>). Economia líquida em projetos: <span style="color:var(--grn)"><strong>R$10.562,50 (−28,5%)</strong></span>. Atualizar "Real" conforme pagamentos forem realizados.</div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="panel" id="panel-checklist">
+  <div class="alert alert-ylw"><div class="alert-icon">📋</div><div><div class="alert-title">Checklist — CEF SBPE PF (Terreno + Construção)</div><div class="alert-body">Financiamento CPF Gabriel Acioly. 5 fases.</div></div></div>
+  <div id="checklist-container"></div>
+  <div style="margin-top:14px;background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:12px;color:var(--mut)">Progresso geral</div>
+    <div style="font-size:13px;font-weight:700;color:var(--grn)" id="check-progress">0 / 40 itens</div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="check-bar" style="width:0%"></div></div>
+</div>
+
+<!-- VIABILIDADE -->
+<div class="panel" id="panel-viabilidade">
+  <div class="alert alert-grn"><div class="alert-icon">✅</div><div><div class="alert-title">Dados Reais — Planilha Viabilidade_Alpha_4.xlsx</div><div class="alert-body">Custo construção R$4.500/m² × 187,5m² = R$843.750. Padrão alto. Análise 24/03/2026.</div></div></div>
+  <div class="sem-row">
+    <div class="sem-i"><div class="sem-dot sem-grn"></div><div><div style="font-size:10px;color:var(--mut)">Margem</div><div style="font-size:12px;font-weight:600">✅ VIÁVEL — 24,1%</div></div></div>
+    <div class="sem-i"><div class="sem-dot sem-grn"></div><div><div style="font-size:10px;color:var(--mut)">ROI</div><div style="font-size:12px;font-weight:600">✅ EXCELENTE — 31,7%</div></div></div>
+    <div class="sem-i"><div class="sem-dot sem-ylw"></div><div><div style="font-size:10px;color:var(--mut)">Renda mín. CEF</div><div style="font-size:12px;font-weight:600">R$62.946/mês</div></div></div>
+  </div>
+  <div class="grid2" style="margin-bottom:14px">
+    <div>
+      <div class="sec-ttl">Receitas</div>
+      <div class="card">
+        <div class="vrow"><span style="color:var(--mut)">Preço de Venda</span><span><strong>R$2.000.000</strong></span></div>
+        <div class="vrow"><span style="color:var(--mut)">R$/m²</span><span>R$10.667/m²</span></div>
+        <div class="vrow total"><span>VGV</span><span style="color:var(--acc2)">R$2.000.000</span></div>
+      </div>
+      <div style="margin-top:10px" class="sec-ttl">Resultado</div>
+      <div class="card">
+        <div class="vrow"><span style="color:var(--mut)">Custo total</span><span style="color:var(--red)">R$1.518.813</span></div>
+        <div class="vrow lucro"><span>Lucro Bruto</span><span>R$481.188</span></div>
+        <div class="vrow" style="color:var(--grn)"><span>Margem</span><span><strong>24,1%</strong></span></div>
+        <div class="vrow" style="color:var(--grn)"><span>ROI</span><span><strong>31,7%</strong></span></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-ttl">Custos</div>
+      <div class="card">
+        <div class="vrow"><span style="color:var(--mut)">Terreno</span><span>R$400.000</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Construção</span><span>R$843.750</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Indiretos</span><span>R$72.500</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Impostos s/venda</span><span>R$102.563</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Comissão vendas</span><span>R$100.000</span></div>
+        <div class="vrow total"><span>Total</span><span style="color:var(--red)">R$1.518.813</span></div>
+      </div>
+      <div style="margin-top:10px" class="sec-ttl">Financiamento CEF (SAC)</div>
+      <div class="card">
+        <div class="vrow"><span style="color:var(--mut)">Valor financiado</span><span><strong>R$1.600.000</strong></span></div>
+        <div class="vrow"><span style="color:var(--mut)">Taxa</span><span>11,19% a.a. + TR · 30 anos</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Parcela inicial</span><span style="color:var(--ylw)"><strong>R$18.884</strong></span></div>
+        <div class="vrow"><span style="color:var(--mut)">Renda mínima</span><span style="color:var(--ylw)"><strong>R$62.946/mês</strong></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec"><div class="sec-ttl">Cenários de Preço de Venda</div>
+    <div class="grid4">
+      <div class="sc-card"><div class="sc-name">Conservador</div><div class="sc-price">R$1,8M</div><div class="sc-margin" style="color:var(--ylw)">Margem 15,6%</div><div style="font-size:10px;color:var(--mut);margin-top:4px">Lucro R$281k</div></div>
+      <div class="sc-card" style="border-color:var(--acc)"><div class="sc-name" style="color:var(--acc2)">Base</div><div class="sc-price" style="color:var(--acc2)">R$2,0M</div><div class="sc-margin" style="color:var(--grn)">Margem 24,1%</div><div style="font-size:10px;color:var(--mut);margin-top:4px">Lucro R$481k</div></div>
+      <div class="sc-card"><div class="sc-name">Otimista</div><div class="sc-price">R$2,2M</div><div class="sc-margin" style="color:var(--grn)">Margem 31,0%</div><div style="font-size:10px;color:var(--mut);margin-top:4px">Lucro R$681k</div></div>
+      <div class="sc-card"><div class="sc-name">Agressivo</div><div class="sc-price">R$2,3M</div><div class="sc-margin" style="color:var(--grn)">Margem 34,0%</div><div style="font-size:10px;color:var(--mut);margin-top:4px">Lucro R$781k</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PARCEIROS -->
+<div class="panel" id="panel-parceiros">
+  <div class="sec"><div class="sec-ttl">Equipe do Projeto</div>
+    <div class="grid2">
+      <div class="pcard"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:20px">🏗️</div><div><h3>Otávio Cassimiro</h3><div class="role">Corretor — Lote Q15 L03</div></div></div><div class="info"><span class="tag tag-grn">Contrato assinado ✓</span><br><br>Comissão R$20.000 — responsabilidade dos vendedores.</div></div>
+      <div class="pcard"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:20px">📐</div><div><h3>Arquiteto</h3><div class="role">Projeto Arquitetônico + PCI</div></div></div><div class="info"><span class="tag tag-grn">Cotado R$18.000 ✓</span><br><br>Orçado R$30.000 — economia R$12.000. PCI é documento chave para protocolo CEF.</div></div>
+      <div class="pcard"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:20px">⚙️</div><div><h3>Projetos Complementares</h3><div class="role">Estrutural + Hidr. + Elétrico</div></div></div><div class="info"><span class="tag tag-ylw">Cotado R$8.437,50</span><br><br>Orçado R$7.000 — leve estouro R$1.437,50. ART registradas necessárias antes do alvará.</div></div>
+      <div class="pcard"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:20px">🏦</div><div><h3>Caixa Econômica Federal</h3><div class="role">SBPE PF — Terreno + Construção</div></div></div><div class="info"><span class="tag tag-ylw">Crédito em análise</span><br><br>CPF Gabriel Acioly · R$1.600.000 · 11,19% a.a. + TR.<br><strong style="color:var(--red)">Protocolo até 12/05/2026.</strong></div></div>
+      <div class="pcard"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:20px">📊</div><div><h3>Contador / Assessoria</h3><div class="role">Decore + Tributação</div></div></div><div class="info"><span class="tag tag-red">Ação imediata</span><br><br><strong>Decore</strong> obrigatório na CEF para sócios. Verificar regime tributário para impostos sobre venda.</div></div>
+      <div class="pcard"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:20px">🛡️</div><div><h3>Seguradora</h3><div class="role">Seguro Obra + MIP + DFI</div></div></div><div class="info"><span class="tag tag-gray">A contratar</span><br><br>Seguro obra ~R$2.000. MIP+DFI obrigatório CEF durante financiamento.</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// ===== NAV =====
+function setTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'desembolso' && !window.chartBuilt) buildDesembolsoChart();
+  if (name === 'orcamento' && !window.orcBuilt) buildOrcamento();
+}
+
+const fmt = v => v == null ? '—' : 'R$' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:2});
+const fmtD = v => {
+  if (v == null) return '<span class="delta-neu">—</span>';
+  const s = v < 0 ? '<span class="delta-grn">▼ ' : v > 0 ? '<span class="delta-red">▲ +' : '<span class="delta-neu">';
+  return s + fmt(Math.abs(v)) + ' (' + Math.abs(Math.round(v/Math.abs(v||1)*100)) + '%)' + '</span>';
+};
+
+// ===== ORÇAMENTO DATA =====
+const orcCategories = [
+  {
+    id: 'projetos', label: '📐 Projetos e Licenças',
+    items: [
+      {desc:'Projeto arquitetônico (inclui PCI)', orc:30000, cot:18000, real:null, obs:'Cotação recebida — economia R$12.000'},
+      {desc:'Projeto estrutural + hidr. + elétrico', orc:7000, cot:8437.50, real:null, obs:'Cotados em conjunto. Orc. separado: R$4k+R$3k. Estouro R$1.437,50'},
+      {desc:'ART / RRT', orc:1500, cot:null, real:null, obs:''},
+      {desc:'Topografia + sondagem do solo', orc:2500, cot:null, real:null, obs:''},
+      {desc:'Avaliação técnica CEF (engenharia)', orc:3500, cot:null, real:null, obs:'Pago pelo comprador na aprovação'},
+      {desc:'Alvará de construção (SEMADUR)', orc:3000, cot:null, real:null, obs:''},
+      {desc:'Habite-se', orc:2000, cot:null, real:null, obs:''},
+      {desc:'Registro / averbação construção', orc:5000, cot:null, real:null, obs:'CRI Campo Grande'},
+    ]
+  },
+  {
+    id: 'terreno', label: '🏟️ Terreno e Transferência',
+    items: [
+      {desc:'Sinal do terreno (recursos próprios)', orc:10000, cot:10000, real:10000, obs:'Pago 28/04/2026 ✓'},
+      {desc:'Saldo terreno via CEF → Vendedor', orc:390000, cot:390000, real:null, obs:'Contrato fixo — liberação na escritura'},
+      {desc:'ITBI (2,25% sobre R$400k)', orc:9000, cot:null, real:null, obs:'A pagar na escritura definitiva'},
+      {desc:'Taxa bancária / administrativa CEF', orc:3000, cot:null, real:null, obs:''},
+      {desc:'Escritura em cartório', orc:5000, cot:null, real:null, obs:'CRI Campo Grande'},
+    ]
+  },
+  {
+    id: 'obra', label: '🏗️ Construção (Obra)',
+    items: [
+      {desc:'Custo de construção (187,5m² × R$4.500/m²)', orc:843750, cot:null, real:null, obs:'Orçamento analítico a contratar com empreiteiro'},
+      {desc:'Seguro de obra', orc:2000, cot:null, real:null, obs:'Obrigatório CEF'},
+      {desc:'Taxa condominial Alphaville (18 meses)', orc:6323, cot:6323, real:null, obs:'R$351,25/mês — valor contratual fixo'},
+    ]
+  },
+  {
+    id: 'taxas', label: '📋 Taxas, Encargos e Administrativo',
+    items: [
+      {desc:'ISS da obra (5% sobre 40%)', orc:16875, cot:null, real:null, obs:'= 5% × 40% × R$843.750'},
+      {desc:'INSS da construção', orc:4000, cot:null, real:null, obs:'Sobre mão de obra — estimado'},
+      {desc:'Contabilidade / assessoria', orc:3000, cot:null, real:null, obs:'Durante a obra'},
+      {desc:'Marketing / vendas', orc:2000, cot:null, real:null, obs:''},
+      {desc:'Despesas diversas', orc:2000, cot:null, real:null, obs:''},
+    ]
+  }
+];
+
+let orcActiveFilter = 'all';
+
+function orcFilter(f, btn) {
+  orcActiveFilter = f;
+  document.querySelectorAll('#orc-filter-row .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrcTables();
+}
+
+function buildOrcamento() {
+  renderOrcKpis();
+  renderOrcTables();
+  window.orcBuilt = true;
+}
+
+function renderOrcKpis() {
+  let totOrc = 0, totCot = 0, totReal = 0;
+  let cotCount = 0, realCount = 0;
+  orcCategories.forEach(cat => cat.items.forEach(it => {
+    totOrc += it.orc;
+    if (it.cot != null) { totCot += it.cot; cotCount++; }
+    if (it.real != null) { totReal += it.real; realCount++; }
+  }));
+  const cotVsOrc = orcCategories.flatMap(c => c.items.filter(i => i.cot != null)).reduce((s,i) => s + (i.cot - i.orc), 0);
+  const orcOfCotted = orcCategories.flatMap(c => c.items.filter(i => i.cot != null)).reduce((s,i) => s + i.orc, 0);
+  const kpis = document.getElementById('orc-kpis');
+  kpis.innerHTML = `
+    <div class="kpi"><div class="kpi-lbl">📋 Total Orçado</div><div class="kpi-val">${fmt(totOrc)}</div><div class="kpi-sub">Referência base (planilha)</div></div>
+    <div class="kpi ${cotVsOrc < 0 ? 'kpi-grn' : 'kpi-red'}"><div class="kpi-lbl">💬 Cotações (${cotCount} itens)</div><div class="kpi-val">${fmt(totCot)}</div><div class="kpi-sub">vs orçado: ${cotVsOrc < 0 ? '−' : '+'}${fmt(Math.abs(cotVsOrc))} (${Math.round(cotVsOrc/orcOfCotted*100)}%)</div></div>
+    <div class="kpi kpi-grn"><div class="kpi-lbl">✅ Total Pago (${realCount} itens)</div><div class="kpi-val">${fmt(totReal)}</div><div class="kpi-sub">Confirmado</div></div>
+    <div class="kpi kpi-grn"><div class="kpi-lbl">💚 Economia líquida</div><div class="kpi-val">${fmt(Math.abs(cotVsOrc))}</div><div class="kpi-sub">Nas cotações recebidas</div></div>
+  `;
+}
+
+function renderOrcTables() {
+  const container = document.getElementById('orc-tables');
+  container.innerHTML = '';
+  orcCategories.forEach(cat => {
+    if (orcActiveFilter !== 'all' && cat.id !== orcActiveFilter) return;
+    const catOrc = cat.items.reduce((s,i)=>s+i.orc,0);
+    const catCot = cat.items.filter(i=>i.cot!=null).reduce((s,i)=>s+i.cot,0);
+    const catReal = cat.items.filter(i=>i.real!=null).reduce((s,i)=>s+i.real,0);
+    const hasCot = cat.items.some(i=>i.cot!=null);
+    const sec = document.createElement('div');
+    sec.className = 'orc-section';
+    let html = `<div class="orc-cat">${cat.label}<span style="font-size:11px;color:var(--mut);font-weight:400">Orçado ${fmt(catOrc)}${hasCot?' · Cotado '+fmt(catCot):''}</span></div>`;
+    html += `<div class="orc-table"><table>
+      <thead><tr>
+        <th style="min-width:220px">Item</th>
+        <th>Orçado</th>
+        <th>Cotado</th>
+        <th>Δ Cotado</th>
+        <th>Real (Pago)</th>
+        <th>Situação</th>
+      </tr></thead><tbody>`;
+    cat.items.forEach(it => {
+      const delta = it.cot != null ? it.cot - it.orc : null;
+      const rowCls = it.real != null ? '' : (delta != null ? (delta < 0 ? 'row-grn' : 'row-red') : '');
+      const sitTag = it.real != null
+        ? '<span class="tag tag-grn">Pago ✓</span>'
+        : it.cot != null
+          ? (delta < 0 ? '<span class="tag tag-grn">Cotado ↓</span>' : '<span class="tag tag-red">Cotado ↑</span>')
+          : '<span class="tag tag-gray">Sem cotação</span>';
+      const realCell = it.real != null
+        ? `<span class="val-real">${fmt(it.real)}</span>`
+        : `<span class="val-empty">—</span>`;
+      const cotCell = it.cot != null ? `<strong>${fmt(it.cot)}</strong>` : `<span class="val-empty">aguardando</span>`;
+      html += `<tr class="${rowCls}">
+        <td>
+          <div style="font-weight:500">${it.desc}</div>
+          ${it.obs ? `<div class="orc-obs">${it.obs}</div>` : ''}
+        </td>
+        <td>${fmt(it.orc)}</td>
+        <td>${cotCell}</td>
+        <td>${fmtD(delta)}</td>
+        <td>${realCell}</td>
+        <td>${sitTag}</td>
+      </tr>`;
+    });
+    // Total row
+    html += `<tr class="row-total">
+      <td>SUBTOTAL</td>
+      <td>${fmt(catOrc)}</td>
+      <td>${hasCot ? fmt(catCot) : '<span class="val-empty">parcial</span>'}</td>
+      <td>${hasCot ? fmtD(catCot - cat.items.filter(i=>i.cot!=null).reduce((s,i)=>s+i.orc,0)) : '<span class="delta-neu">—</span>'}</td>
+      <td>${catReal > 0 ? `<span class="val-real">${fmt(catReal)}</span>` : '<span class="val-empty">—</span>'}</td>
+      <td></td>
+    </tr>`;
+    html += `</tbody></table></div>`;
+    sec.innerHTML = html;
+    container.appendChild(sec);
+  });
+}
+
+// ===== DESEMBOLSO =====
+const phases = [
+  { label:'Pré-Protocolo', sub:'Mai/26 · URGENTE', urgente:true, proprio:54500, cef:0,
+    items:[
+      {t:'prop',desc:'Sinal do terreno',val:10000,quando:'28/04/2026',status:'pago'},
+      {t:'prop',desc:'Projeto arquitetônico (PCI)',val:18000,quando:'Antes 12/05',status:'urgente'},
+      {t:'prop',desc:'Estrutural + Hidr. + Elét.',val:8437.50,quando:'Antes 12/05',status:'urgente'},
+      {t:'prop',desc:'ART / RRT',val:1500,quando:'Antes 12/05',status:'urgente'},
+      {t:'prop',desc:'Topografia + sondagem',val:2500,quando:'Antes 12/05',status:'urgente'},
+      {t:'prop',desc:'Avaliação técnica CEF',val:3500,quando:'Protocolo',status:'pendente'},
+    ]
+  },
+  { label:'Protocolo / Aprovação', sub:'Jun–Jul/26', proprio:20000, cef:0,
+    items:[
+      {t:'prop',desc:'Alvará de construção (SEMADUR)',val:3000,quando:'Após projetos',status:'pendente'},
+      {t:'prop',desc:'ITBI (2,25% × R$400k)',val:9000,quando:'Escritura',status:'pendente'},
+      {t:'prop',desc:'Taxa bancária CEF',val:3000,quando:'Aprovação',status:'pendente'},
+      {t:'prop',desc:'Escritura em cartório',val:5000,quando:'Escritura',status:'pendente'},
+    ]
+  },
+  { label:'Escritura + Terreno', sub:'Ago/26', proprio:0, cef:390000,
+    items:[{t:'cef',desc:'L0 — Saldo terreno (CEF → Vendedor)',val:390000,quando:'Aprovação CEF',status:'pendente'}]
+  },
+  { label:'Fundação', sub:'M1–M3', proprio:2000, cef:84375,
+    items:[
+      {t:'cef',desc:'L1 — Fundação 10%',val:84375,quando:'Mês 3',status:'pendente'},
+      {t:'prop',desc:'Taxas Alphaville (3 meses)',val:1054,quando:'Mensal',status:'pendente'},
+      {t:'prop',desc:'Despesas diversas',val:946,quando:'Obra',status:'pendente'},
+    ]
+  },
+  { label:'Estrutura / Alvenaria', sub:'M4–M7', proprio:3000, cef:337500,
+    items:[
+      {t:'cef',desc:'L2 — Estrutura 20%',val:168750,quando:'Mês 6',status:'pendente'},
+      {t:'cef',desc:'L3 — Alvenaria 20%',val:168750,quando:'Mês 8',status:'pendente'},
+      {t:'prop',desc:'Taxas + seguro + misc',val:3000,quando:'Mensal',status:'pendente'},
+    ]
+  },
+  { label:'Cobertura / Inst.', sub:'M8–M11', proprio:3500, cef:253126,
+    items:[
+      {t:'cef',desc:'L4 — Cobertura 15%',val:126563,quando:'Mês 10',status:'pendente'},
+      {t:'cef',desc:'L5 — Instalações 15%',val:126563,quando:'Mês 12',status:'pendente'},
+      {t:'prop',desc:'Taxas + contabilidade + misc',val:3500,quando:'Mensal',status:'pendente'},
+    ]
+  },
+  { label:'Revestimentos', sub:'M12–M15', proprio:2500, cef:168750,
+    items:[
+      {t:'cef',desc:'L6 — Acabamentos 20%',val:168750,quando:'Mês 15',status:'pendente'},
+      {t:'prop',desc:'Taxas + misc',val:2500,quando:'Mensal',status:'pendente'},
+    ]
+  },
+  { label:'Acabamentos', sub:'M16–M18', proprio:2500, cef:0,
+    items:[{t:'prop',desc:'Taxas Alphaville + marketing + misc',val:2500,quando:'Mensal',status:'pendente'}]
+  },
+  { label:'Entrega / Cartório', sub:'Q1/2028', proprio:28873, cef:0,
+    items:[
+      {t:'prop',desc:'Habite-se',val:2000,quando:'Conclusão',status:'pendente'},
+      {t:'prop',desc:'Averbação construção',val:5000,quando:'Habite-se',status:'pendente'},
+      {t:'prop',desc:'ISS obra',val:16875,quando:'Fim obra',status:'pendente'},
+      {t:'prop',desc:'INSS da construção',val:4000,quando:'Obra',status:'pendente'},
+      {t:'prop',desc:'Marketing / misc',val:998,quando:'Venda',status:'pendente'},
+    ]
+  },
+];
+
+let currentFilter = 'all';
+let desembolsoChart = null;
+const fmtV = v => 'R$' + v.toLocaleString('pt-BR');
+
+function buildDesembolsoChart() {
+  const ctx = document.getElementById('chartDesembolso').getContext('2d');
+  desembolsoChart = new Chart(ctx, {
+    data: {
+      labels: phases.map(p => p.label),
+      datasets: [
+        { type:'bar', label:'🟠 Recursos Próprios', data:phases.map(p=>p.proprio), backgroundColor:'rgba(249,115,22,0.75)', borderColor:'rgba(249,115,22,1)', borderWidth:1, borderRadius:4, yAxisID:'y' },
+        { type:'bar', label:'🔵 Via CEF', data:phases.map(p=>p.cef), backgroundColor:'rgba(91,106,247,0.75)', borderColor:'rgba(91,106,247,1)', borderWidth:1, borderRadius:4, yAxisID:'y' },
+        { type:'line', label:'📈 Acumulado', data:(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;})();}()), borderColor:'rgba(34,197,94,0.9)', backgroundColor:'rgba(34,197,94,0.1)', borderWidth:2, pointRadius:4, fill:false, tension:0.3, yAxisID:'y2' }
+      ]
+    },
+    options: {
+      responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{ legend:{labels:{color:'#8892a4',font:{size:11}}}, tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtV(c.parsed.y)}`}} },
+      scales:{
+        x:{ticks:{color:'#8892a4',font:{size:10}},grid:{color:'rgba(45,49,72,0.5)'}},
+        y:{ticks:{color:'#8892a4',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(45,49,72,0.4)'},position:'left'},
+        y2:{ticks:{color:'rgba(34,197,94,0.8)',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{display:false},position:'right'}
+      }
+    }
+  });
+  window.chartBuilt = true;
+  buildFaseContainer(currentFilter);
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-row .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (desembolsoChart) {
+    const ds = desembolsoChart.data.datasets;
+    if (f==='all'){ds[0].data=phases.map(p=>p.proprio);ds[1].data=phases.map(p=>p.cef);ds[0].hidden=false;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;})();}());}
+    else if(f==='prop'){ds[0].data=phases.map(p=>p.proprio);ds[1].hidden=true;ds[0].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio;return a;})();}());}
+    else{ds[1].data=phases.map(p=>p.cef);ds[0].hidden=true;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.cef;return a;})();}());}
+    desembolsoChart.update();
+  }
+  buildFaseContainer(f);
+}
+
+function buildFaseContainer(f) {
+  const c = document.getElementById('fase-container');
+  c.innerHTML = '';
+  phases.forEach((ph, pi) => {
+    const items = f==='all' ? ph.items : f==='prop' ? ph.items.filter(i=>i.t==='prop') : ph.items.filter(i=>i.t==='cef');
+    if (!items.length) return;
+    const total = items.reduce((s,i)=>s+i.val,0);
+    const div = document.createElement('div');
+    div.className = 'phase-section';
+    div.innerHTML = `<div class="phase-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
+      <div class="phase-hdr-l"><span style="font-size:11px;background:var(--sur2);padding:2px 8px;border-radius:10px;color:var(--mut)">${pi+1}</span>${ph.label}${ph.urgente?' ⚠️':''}<span style="font-size:10px;color:var(--mut);font-weight:400">${ph.sub}</span></div>
+      <div class="phase-hdr-r">${ph.proprio>0&&(f==='all'||f==='prop')?`<span style="color:var(--org)">${fmtV(ph.proprio)} próprio</span>`:''}${ph.cef>0&&(f==='all'||f==='cef')?`<span style="color:var(--acc2)">${fmtV(ph.cef)} CEF</span>`:''}<span style="color:var(--mut)">▼</span></div>
+    </div>
+    <div class="phase-body">${items.map(it=>`<div class="detalhe-item">
+      <div class="d-dot ${it.t==='prop'?'d-prop':'d-cef'}"></div>
+      <div style="flex:1"><div class="d-desc">${it.desc}</div></div>
+      <div class="d-quando">${it.quando}</div>
+      <div style="margin-left:8px">${it.status==='pago'?'<span class="tag tag-grn">Pago ✓</span>':it.status==='urgente'?'<span class="tag tag-red">Urgente</span>':'<span class="tag tag-gray">Pendente</span>'}</div>
+      <div class="d-val" style="margin-left:10px;color:${it.t==='prop'?'var(--org)':'var(--acc2)'}">${fmtV(it.val)}</div>
+    </div>`).join('')}
+    <div style="padding:8px 14px;font-size:11px;color:var(--mut);text-align:right;border-top:1px solid rgba(45,49,72,.3)">Subtotal: <strong style="color:var(--txt)">${fmtV(total)}</strong></div>
+    </div>`;
+    c.appendChild(div);
+  });
+}
+
+// ===== CHECKLIST =====
+const checklists = [
+  { title:'FASE 1 — Aprovação Crédito CPF', color:'var(--acc2)', items:[
+    {text:'Decore (Declaração Comprobatória de Percepção de Rendimentos)',sub:'Obrigatório para sócio/autônomo na CEF',done:false},
+    {text:'IRPF — Últimas 2 declarações com recibo',sub:'',done:false},
+    {text:'Extratos bancários PF — 3 meses',sub:'',done:false},
+    {text:'Extratos bancários PJ OTR — 6 meses',sub:'',done:false},
+    {text:'RG e CPF — Gabriel e Sofia',sub:'',done:false},
+    {text:'Certidão de casamento',sub:'',done:false},
+    {text:'Comprovante de endereço — 3 meses',sub:'',done:false},
+  ]},
+  { title:'FASE 2 — Protocolo CEF ⚠️ Até 12/05', color:'var(--red)', items:[
+    {text:'Contrato de Compra e Venda assinado',sub:'Compromisso_Compra_Venda_Alphaville_IV_Q15_L03_FINAL.pdf',done:true},
+    {text:'Recibo do sinal R$10.000',sub:'Pago 28/04/2026',done:true},
+    {text:'Matrícula atualizada — Mat. 244.050',sub:'Max 30 dias · CRI Campo Grande',done:false},
+    {text:'CND do vendedor (INSS, RF, Estadual, Municipal)',sub:'',done:false},
+    {text:'Declaração de ônus reais — cartório',sub:'',done:false},
+    {text:'PCI — Proposta de Construção Individual',sub:'Elaborada pelo arquiteto',done:false},
+    {text:'Projeto arquitetônico',sub:'',done:false},
+    {text:'Formulários de cadastro CEF',sub:'',done:false},
+  ]},
+  { title:'FASE 3 — Aprovação Financiamento (até 27/07)', color:'var(--ylw)', items:[
+    {text:'Laudo de avaliação CEF (R$2.000.000)',sub:'',done:false},
+    {text:'Projeto estrutural com ART CREA',sub:'',done:false},
+    {text:'Projetos hidr. e elétrico com ART/RRT',sub:'',done:false},
+    {text:'Memorial descritivo da obra',sub:'',done:false},
+    {text:'Orçamento analítico da obra',sub:'',done:false},
+    {text:'Cronograma físico-financeiro 18 meses',sub:'',done:false},
+    {text:'ART de execução da obra',sub:'',done:false},
+  ]},
+  { title:'FASE 4 — Início Obra e Medições', color:'var(--org)', items:[
+    {text:'Alvará de construção — SEMADUR',sub:'',done:false},
+    {text:'Aprovação Associação Alphaville CG4',sub:'',done:false},
+    {text:'Contrato empreiteiro / OTR Engenharia',sub:'',done:false},
+    {text:'Seguro de obra contratado',sub:'',done:false},
+    {text:'Liberações L1 a L6 (medições CEF)',sub:'6 etapas ao longo dos 18 meses',done:false},
+  ]},
+  { title:'FASE 5 — Entrega e Encerramento', color:'var(--grn)', items:[
+    {text:'Habite-se',sub:'',done:false},
+    {text:'ART de conclusão',sub:'',done:false},
+    {text:'Averbação construção — Mat. 244.050',sub:'',done:false},
+    {text:'Recolhimento INSS da construção',sub:'',done:false},
+    {text:'Escritura definitiva de compra e venda',sub:'',done:false},
+  ]},
+];
+const cstate = {};
+const ccontainer = document.getElementById('checklist-container');
+let totalCk = 0;
+checklists.forEach((gr, gi) => {
+  const grp = document.createElement('div');
+  grp.className = 'cbox';
+  const hdr = document.createElement('div');
+  hdr.className = 'cbox-hdr';
+  hdr.innerHTML = `<div class="cbox-hdr-l"><span style="width:10px;height:10px;border-radius:50%;background:${gr.color};display:inline-block"></span>${gr.title}</div><span id="gc${gi}" style="font-size:11px;color:var(--mut)"></span>`;
+  hdr.onclick = () => { const b = grp.querySelector('.cbox-body'); b.style.display = b.style.display==='none'?'':'none'; };
+  const body = document.createElement('div');
+  body.className = 'cbox-body';
+  gr.items.forEach((it, ii) => {
+    totalCk++;
+    const key = `${gi}-${ii}`;
+    const isDone = cstate[key] !== undefined ? cstate[key] : it.done;
+    const el = document.createElement('div');
+    el.className = 'citem';
+    el.innerHTML = `<div class="cb ${isDone?'checked':''}" id="cb${gi}${ii}"></div><div><div class="ctext" style="${isDone?'text-decoration:line-through;opacity:.55':''}" id="ct${gi}${ii}">${it.text}</div>${it.sub?`<div class="csub">${it.sub}</div>`:''}</div>`;
+    el.onclick = () => {
+      const cb = document.getElementById(`cb${gi}${ii}`);
+      const ct = document.getElementById(`ct${gi}${ii}`);
+      const was = cb.classList.contains('checked');
+      cb.classList.toggle('checked');
+      ct.style.textDecoration = was?'':'line-through';
+      ct.style.opacity = was?'':'.55';
+      cstate[key] = !was;
+      updateCkProgress(); updateGc(gi);
+    };
+    body.appendChild(el);
+  });
+  grp.appendChild(hdr);
+  grp.appendChild(body);
+  ccontainer.appendChild(grp);
+});
+function updateGc(gi) {
+  let d = 0;
+  checklists[gi].items.forEach((_,ii) => { if (document.getElementById(`cb${gi}${ii}`)?.classList.contains('checked')) d++; });
+  const el = document.getElementById(`gc${gi}`);
+  if (el) el.textContent = `${d}/${checklists[gi].items.length}`;
+}
+function updateCkProgress() {
+  let c = 0;
+  document.querySelectorAll('.cb.checked').forEach(()=>c++);
+  const pct = Math.round(c/totalCk*100);
+  document.getElementById('check-progress').textContent = `${c} / ${totalCk} itens (${pct}%)`;
+  document.getElementById('check-bar').style.width = pct+'%';
+}
+checklists.forEach((_,gi)=>updateGc(gi));
+updateCkProgress();
+</script>
+</body>
+</html>
