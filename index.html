@@ -564,7 +564,7 @@ function initFinanceiro() {
   } else {
     document.getElementById('fin-setup').style.display   = 'none';
     document.getElementById('fin-content').style.display = 'block';
-    loadFinData();
+    loadAllData();
   }
 }
 
@@ -584,9 +584,7 @@ function resetFinConfig() {
   document.getElementById('fin-content').style.display = 'none';
 }
 
-function reloadFin() {
-  loadFinData();
-}
+function reloadFin() { loadAllData(); }
 
 // JSONP helper — bypassa CORS do Apps Script
 function gsFetch(url, cb) {
@@ -623,6 +621,72 @@ function loadFinData() {
   });
 }
 
+// ===== PARSERS: Sheets → estruturas do dashboard =====
+const toNum  = v => (v === '' || v === null || v === false || v === undefined || isNaN(parseFloat(v))) ? null : parseFloat(v);
+const toBool = v => v === true || v === 'TRUE' || v === 'true' || v === 1;
+
+function parseOrcamento(rows) {
+  const cats = {}, catOrder = [];
+  rows.forEach(row => {
+    const id = row.cat_id;
+    if (!cats[id]) { cats[id] = {id, label: row.cat_label, items: []}; catOrder.push(id); }
+    cats[id].items.push({ desc: row.desc||'', orc: toNum(row.orc)||0, cot: toNum(row.cot), real: toNum(row.real), obs: row.obs||'' });
+  });
+  return catOrder.map(id => cats[id]);
+}
+
+function parseDesembolso(rows) {
+  const phs = {}, phOrder = [];
+  rows.forEach(row => {
+    const fi = parseInt(row.fi);
+    if (!phs[fi]) { phs[fi] = {label:row.label, sub:row.sub, urgente:toBool(row.urgente), proprio:0, cef:0, items:[]}; phOrder.push(fi); }
+    const val = parseFloat(row.val) || 0;
+    if (row.tipo === 'prop') phs[fi].proprio += val;
+    else if (row.tipo === 'cef') phs[fi].cef += val;
+    phs[fi].items.push({t:row.tipo, desc:row.desc, val, quando:row.quando, status:row.status||'pendente'});
+  });
+  return phOrder.sort((a,b) => a - b).map(fi => phs[fi]);
+}
+
+function parseChecklist(rows) {
+  const groups = {}, grOrder = [];
+  rows.forEach(row => {
+    const gi = parseInt(row.gi);
+    if (!groups[gi]) { groups[gi] = {title:row.titulo, color:row.cor, items:[]}; grOrder.push(gi); }
+    groups[gi].items.push({text:row.texto, sub:row.sub||'', done:toBool(row.done)});
+  });
+  return grOrder.sort((a,b) => a - b).map(gi => groups[gi]);
+}
+
+function loadAllData() {
+  document.getElementById('fin-status').textContent = 'Carregando dados…';
+  gsFetch(finApiUrl + '?action=read_all', function(json) {
+    if (!json || !json.ok) {
+      document.getElementById('fin-status').textContent = 'Erro ao carregar. Verifique a URL.';
+      return;
+    }
+    finData = Array.isArray(json.pagamentos) ? json.pagamentos : [];
+    document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
+    if (Array.isArray(json.orcamento) && json.orcamento.length) {
+      orcCategories = parseOrcamento(json.orcamento);
+      window.orcBuilt = false;
+    }
+    if (Array.isArray(json.desembolso) && json.desembolso.length) {
+      phases = parseDesembolso(json.desembolso);
+    }
+    if (Array.isArray(json.checklist) && json.checklist.length) {
+      checklists = parseChecklist(json.checklist);
+      buildChecklist();
+    }
+    renderFinanceiro();
+    if (document.getElementById('panel-desembolso').classList.contains('active')) {
+      clearTimeout(window._chartT); window._chartT = setTimeout(buildDesembolsoChart, 150);
+    }
+    if (document.getElementById('panel-orcamento').classList.contains('active')) {
+      window.orcBuilt = false; buildOrcamento();
+    }
+  });
+}
 function renderFinanceiro() {
   const saidas   = finData.filter(r => r.tipo === 'SAIDA');
   const entradas = finData.filter(r => r.tipo === 'ENTRADA');
@@ -777,7 +841,7 @@ function submitPayment() {
 }
 
 // ===== ORÇAMENTO DATA =====
-const orcCategories = [
+let orcCategories = [
   { id:'projetos', label:'📐 Projetos e Licenças', items:[
     {desc:'Projeto arquitetônico (inclui PCI)', orc:30000, cot:18000, real:null, obs:'Cotação recebida — economia R$12.000'},
     {desc:'Projeto estrutural + hidr. + elétrico', orc:7000, cot:8437.50, real:null, obs:'Cotados em conjunto. Estouro R$1.437,50'},
@@ -859,7 +923,7 @@ function renderOrcTables() {
 }
 
 // ===== DESEMBOLSO =====
-const phases=[
+let phases=[
   {label:'Pré-Protocolo',sub:'Mai/26 · URGENTE',urgente:true,proprio:54500,cef:0,items:[
     {t:'prop',desc:'Sinal do terreno',val:10000,quando:'28/04/2026',status:'pago'},
     {t:'prop',desc:'Projeto arquitetônico (PCI)',val:18000,quando:'Antes 12/05',status:'urgente'},
@@ -979,7 +1043,7 @@ function buildFaseContainer(f){
 }
 
 // ===== CHECKLIST =====
-const checklists=[
+let checklists=[
   {title:'FASE 1 — Aprovação Crédito CPF',color:'var(--acc2)',items:[
     {text:'Decore (Declaração Comprobatória de Percepção de Rendimentos)',sub:'Obrigatório para sócio/autônomo na CEF',done:false},
     {text:'IRPF — Últimas 2 declarações com recibo',sub:'',done:false},
@@ -1023,39 +1087,61 @@ const checklists=[
     {text:'Escritura definitiva de compra e venda',sub:'',done:false},
   ]},
 ];
-const cstate={};
-const ccontainer=document.getElementById('checklist-container');
-let totalCk=0;
-checklists.forEach((gr,gi)=>{
-  const grp=document.createElement('div');grp.className='cbox';
-  const hdr=document.createElement('div');hdr.className='cbox-hdr';
-  hdr.innerHTML=`<div class="cbox-hdr-l"><span style="width:10px;height:10px;border-radius:50%;background:${gr.color};display:inline-block"></span>${gr.title}</div><span id="gc${gi}" style="font-size:11px;color:var(--mut)"></span>`;
-  hdr.onclick=()=>{const b=grp.querySelector('.cbox-body');b.style.display=b.style.display==='none'?'':'none';};
-  const body=document.createElement('div');body.className='cbox-body';
-  gr.items.forEach((it,ii)=>{
-    totalCk++;
-    const key=`${gi}-${ii}`;
-    const isDone=cstate[key]!==undefined?cstate[key]:it.done;
-    const el=document.createElement('div');el.className='citem';
-    el.innerHTML=`<div class="cb ${isDone?'checked':''}" id="cb${gi}${ii}"></div><div><div class="ctext" style="${isDone?'text-decoration:line-through;opacity:.55':''}" id="ct${gi}${ii}">${it.text}</div>${it.sub?`<div class="csub">${it.sub}</div>`:''}</div>`;
-    el.onclick=()=>{
-      const cb=document.getElementById(`cb${gi}${ii}`);
-      const ct=document.getElementById(`ct${gi}${ii}`);
-      const was=cb.classList.contains('checked');
-      cb.classList.toggle('checked');
-      ct.style.textDecoration=was?'':'line-through';
-      ct.style.opacity=was?'':'.55';
-      cstate[key]=!was;
-      updateCkProgress();updateGc(gi);
-    };
-    body.appendChild(el);
+let cstate = {};
+const ccontainer = document.getElementById('checklist-container');
+let totalCk = 0;
+
+function buildChecklist() {
+  cstate = {}; totalCk = 0; ccontainer.innerHTML = '';
+  checklists.forEach((gr, gi) => {
+    const grp = document.createElement('div'); grp.className = 'cbox';
+    const hdr = document.createElement('div'); hdr.className = 'cbox-hdr';
+    hdr.innerHTML = '<div class="cbox-hdr-l"><span style="width:10px;height:10px;border-radius:50%;background:' + gr.color + ';display:inline-block"></span>' + gr.title + '</div><span id="gc' + gi + '" style="font-size:11px;color:var(--mut)"></span>';
+    hdr.onclick = () => { const b = grp.querySelector('.cbox-body'); b.style.display = b.style.display === 'none' ? '' : 'none'; };
+    const body = document.createElement('div'); body.className = 'cbox-body';
+    gr.items.forEach((it, ii) => {
+      totalCk++;
+      const key = gi + '-' + ii;
+      const isDone = cstate[key] !== undefined ? cstate[key] : it.done;
+      const el = document.createElement('div'); el.className = 'citem';
+      el.innerHTML = '<div class="cb ' + (isDone ? 'checked' : '') + '" id="cb' + gi + ii + '"></div>' +
+        '<div><div class="ctext" style="' + (isDone ? 'text-decoration:line-through;opacity:.55' : '') + '" id="ct' + gi + ii + '">' + it.text + '</div>' +
+        (it.sub ? '<div class="csub">' + it.sub + '</div>' : '') + '</div>';
+      el.onclick = () => {
+        const cb = document.getElementById('cb' + gi + ii);
+        const ct = document.getElementById('ct' + gi + ii);
+        const was = cb.classList.contains('checked');
+        cb.classList.toggle('checked');
+        ct.style.textDecoration = was ? '' : 'line-through';
+        ct.style.opacity = was ? '' : '.55';
+        const newState = !was;
+        cstate[key] = newState; updateCkProgress(); updateGc(gi);
+        if (finApiUrl) {
+          gsFetch(finApiUrl + '?action=update_checklist&gi=' + gi + '&ii=' + ii + '&done=' + newState, function() {});
+        }
+      };
+      body.appendChild(el);
+    });
+    grp.appendChild(hdr); grp.appendChild(body); ccontainer.appendChild(grp);
   });
-  grp.appendChild(hdr);grp.appendChild(body);ccontainer.appendChild(grp);
-});
-function updateGc(gi){let d=0;checklists[gi].items.forEach((_,ii)=>{if(document.getElementById(`cb${gi}${ii}`)?.classList.contains('checked'))d++;});const el=document.getElementById(`gc${gi}`);if(el)el.textContent=`${d}/${checklists[gi].items.length}`;}
-function updateCkProgress(){let c=0;document.querySelectorAll('.cb.checked').forEach(()=>c++);const pct=Math.round(c/totalCk*100);document.getElementById('check-progress').textContent=`${c} / ${totalCk} itens (${pct}%)`;document.getElementById('check-bar').style.width=pct+'%';}
-checklists.forEach((_,gi)=>updateGc(gi));
-updateCkProgress();
+  checklists.forEach((_, gi) => updateGc(gi));
+  updateCkProgress();
+}
+
+function updateGc(gi) {
+  let d = 0;
+  checklists[gi].items.forEach((_, ii) => {
+    if (document.getElementById('cb' + gi + ii) && document.getElementById('cb' + gi + ii).classList.contains('checked')) d++;
+  });
+  const el = document.getElementById('gc' + gi); if (el) el.textContent = d + '/' + checklists[gi].items.length;
+}
+function updateCkProgress() {
+  let c = 0; document.querySelectorAll('.cb.checked').forEach(() => c++);
+  const pct = totalCk > 0 ? Math.round(c / totalCk * 100) : 0;
+  document.getElementById('check-progress').textContent = c + ' / ' + totalCk + ' itens (' + pct + '%)';
+  document.getElementById('check-bar').style.width = pct + '%';
+}
+buildChecklist();
 </script>
 </body>
 </html>
