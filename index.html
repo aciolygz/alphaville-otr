@@ -439,7 +439,7 @@ function initFinanceiro() {
   } else {
     document.getElementById('fin-setup').style.display = 'none';
     document.getElementById('fin-content').style.display = 'block';
-    loadFinData();
+    loadAllData();
   }
 }
 function saveFinUrl() {
@@ -453,23 +453,77 @@ function resetFinConfig() {
   document.getElementById('fin-setup').style.display = 'block';
   document.getElementById('fin-content').style.display = 'none';
 }
-function reloadFin() { loadFinData(); }
+function reloadFin() { loadAllData(); }
+
+const toNum  = v => (v===''||v===null||v===false||v===undefined||isNaN(parseFloat(v))) ? null : parseFloat(v);
+const toBool = v => v===true||v==='TRUE'||v==='true'||v===1;
+
+// ===== PARSERS: Sheets → estruturas do dashboard =====
+function parseOrcamento(rows) {
+  const cats = {}, catOrder = [];
+  rows.forEach(row => {
+    const id = row.cat_id;
+    if (!cats[id]) { cats[id] = {id, label: row.cat_label, items: []}; catOrder.push(id); }
+    cats[id].items.push({ desc: row.desc||'', orc: toNum(row.orc)||0, cot: toNum(row.cot), real: toNum(row.real), obs: row.obs||'' });
+  });
+  return catOrder.map(id => cats[id]);
+}
+function parseDesembolso(rows) {
+  const phs = {}, phOrder = [];
+  rows.forEach(row => {
+    const fi = parseInt(row.fi);
+    if (!phs[fi]) { phs[fi] = {label:row.label, sub:row.sub, urgente:toBool(row.urgente), proprio:0, cef:0, items:[]}; phOrder.push(fi); }
+    const val = parseFloat(row.val)||0;
+    if (row.tipo==='prop') phs[fi].proprio += val; else if (row.tipo==='cef') phs[fi].cef += val;
+    phs[fi].items.push({t:row.tipo, desc:row.desc, val, quando:row.quando, status:row.status||'pendente'});
+  });
+  return phOrder.sort((a,b)=>a-b).map(fi=>phs[fi]);
+}
+function parseChecklist(rows) {
+  const groups = {}, grOrder = [];
+  rows.forEach(row => {
+    const gi = parseInt(row.gi);
+    if (!groups[gi]) { groups[gi] = {title:row.titulo, color:row.cor, items:[]}; grOrder.push(gi); }
+    groups[gi].items.push({text:row.texto, sub:row.sub||'', done:toBool(row.done)});
+  });
+  return grOrder.sort((a,b)=>a-b).map(gi=>groups[gi]);
+}
 
 function gsFetch(url, cb) {
-  var name = '_gs_' + Date.now(), s = document.createElement('script'), done = false;
+  var name = '_gs_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), s = document.createElement('script'), done = false;
   window[name] = function(data) { done=true; delete window[name]; if(s.parentNode)s.parentNode.removeChild(s); cb(data); };
   s.onerror = function() { if(done)return; done=true; delete window[name]; if(s.parentNode)s.parentNode.removeChild(s); cb(null); };
   s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + name;
   document.body.appendChild(s);
 }
 
-function loadFinData() {
+function loadAllData() {
   document.getElementById('fin-status').textContent = 'Carregando dados…';
-  gsFetch(finApiUrl + '?action=read', function(json) {
-    if (!json) { document.getElementById('fin-status').textContent = 'Erro ao carregar. Verifique a URL.'; return; }
-    finData = Array.isArray(json.data) ? json.data : [];
+  gsFetch(finApiUrl + '?action=read_all', function(json) {
+    if (!json || !json.ok) {
+      document.getElementById('fin-status').textContent = 'Erro ao carregar. Verifique a URL.';
+      return;
+    }
+    finData = Array.isArray(json.pagamentos) ? json.pagamentos : [];
     document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
+    if (Array.isArray(json.orcamento) && json.orcamento.length) {
+      orcCategories = parseOrcamento(json.orcamento);
+      window.orcBuilt = false;
+    }
+    if (Array.isArray(json.desembolso) && json.desembolso.length) {
+      phases = parseDesembolso(json.desembolso);
+    }
+    if (Array.isArray(json.checklist) && json.checklist.length) {
+      checklists = parseChecklist(json.checklist);
+      buildChecklist();
+    }
     renderFinanceiro();
+    if (document.getElementById('panel-desembolso').classList.contains('active')) {
+      clearTimeout(window._chartT); window._chartT = setTimeout(buildDesembolsoChart, 150);
+    }
+    if (document.getElementById('panel-orcamento').classList.contains('active')) {
+      window.orcBuilt = false; buildOrcamento();
+    }
   });
 }
 
@@ -550,7 +604,7 @@ function submitPayment() {
 }
 
 // ===== ORÇAMENTO =====
-const orcCategories = [
+let orcCategories = [
   { id:'projetos', label:'📐 Projetos e Licenças', items:[
     {desc:'Projeto arquitetônico (inclui PCI)', orc:30000, cot:18000, real:null, obs:'Cotação recebida — economia R$12.000'},
     {desc:'Projeto estrutural + hidr. + elétrico', orc:7000, cot:8437.50, real:null, obs:'Cotados em conjunto. Estouro R$1.437,50'},
@@ -612,192 +666,4 @@ function renderOrcTables() {
       const sitTag=it.real!=null?'<span class="tag tag-grn">Pago ✓</span>':it.cot!=null?(delta<0?'<span class="tag tag-grn">Cotado ↓</span>':'<span class="tag tag-red">Cotado ↑</span>'):'<span class="tag tag-gray">Sem cotação</span>';
       html+=`<tr class="${rowCls}"><td><div style="font-weight:500">${it.desc}</div>${it.obs?`<div class="orc-obs">${it.obs}</div>`:''}</td><td>${fmt(it.orc)}</td><td>${it.cot!=null?`<strong>${fmt(it.cot)}</strong>`:'<span class="val-empty">aguardando</span>'}</td><td>${fmtD(delta)}</td><td>${it.real!=null?`<span class="val-real">${fmt(it.real)}</span>`:'<span class="val-empty">—</span>'}</td><td>${sitTag}</td></tr>`;
     });
-    html+=`<tr class="row-total"><td>SUBTOTAL</td><td>${fmt(catOrc)}</td><td>${hasCot?fmt(catCot):'<span class="val-empty">parcial</span>'}</td><td>${hasCot?fmtD(catCot-cat.items.filter(i=>i.cot!=null).reduce((s,i)=>s+i.orc,0)):'<span class="delta-neu">—</span>'}</td><td>${catReal>0?`<span class="val-real">${fmt(catReal)}</span>`:'<span class="val-empty">—</span>'}</td><td></td></tr>`;
-    html+=`</tbody></table></div>`; sec.innerHTML=html; container.appendChild(sec);
-  });
-}
-
-// ===== DESEMBOLSO =====
-const phases=[
-  {label:'Pré-Protocolo',sub:'Mai/26 · URGENTE',urgente:true,proprio:54500,cef:0,items:[
-    {t:'prop',desc:'Sinal do terreno',val:10000,quando:'28/04/2026',status:'pago'},
-    {t:'prop',desc:'Projeto arquitetônico (PCI)',val:18000,quando:'Antes 12/05',status:'urgente'},
-    {t:'prop',desc:'Estrutural + Hidr. + Elét.',val:8437.50,quando:'Antes 12/05',status:'urgente'},
-    {t:'prop',desc:'ART / RRT',val:1500,quando:'Antes 12/05',status:'urgente'},
-    {t:'prop',desc:'Topografia + sondagem',val:2500,quando:'Antes 12/05',status:'urgente'},
-    {t:'prop',desc:'Avaliação técnica CEF',val:3500,quando:'Protocolo',status:'pendente'},
-  ]},
-  {label:'Protocolo / Aprovação',sub:'Jun–Jul/26',proprio:20000,cef:0,items:[
-    {t:'prop',desc:'Alvará de construção (SEMADUR)',val:3000,quando:'Após projetos',status:'pendente'},
-    {t:'prop',desc:'ITBI (2,25% × R$400k)',val:9000,quando:'Escritura',status:'pendente'},
-    {t:'prop',desc:'Taxa bancária CEF',val:3000,quando:'Aprovação',status:'pendente'},
-    {t:'prop',desc:'Escritura em cartório',val:5000,quando:'Escritura',status:'pendente'},
-  ]},
-  {label:'Escritura + Terreno',sub:'Ago/26',proprio:0,cef:390000,items:[{t:'cef',desc:'L0 — Saldo terreno (CEF → Vendedor)',val:390000,quando:'Aprovação CEF',status:'pendente'}]},
-  {label:'Fundação',sub:'M1–M3',proprio:2000,cef:84375,items:[
-    {t:'cef',desc:'L1 — Fundação 10%',val:84375,quando:'Mês 3',status:'pendente'},
-    {t:'prop',desc:'Taxas Alphaville (3 meses)',val:1054,quando:'Mensal',status:'pendente'},
-    {t:'prop',desc:'Despesas diversas',val:946,quando:'Obra',status:'pendente'},
-  ]},
-  {label:'Estrutura / Alvenaria',sub:'M4–M7',proprio:3000,cef:337500,items:[
-    {t:'cef',desc:'L2 — Estrutura 20%',val:168750,quando:'Mês 6',status:'pendente'},
-    {t:'cef',desc:'L3 — Alvenaria 20%',val:168750,quando:'Mês 8',status:'pendente'},
-    {t:'prop',desc:'Taxas + seguro + misc',val:3000,quando:'Mensal',status:'pendente'},
-  ]},
-  {label:'Cobertura / Inst.',sub:'M8–M11',proprio:3500,cef:253126,items:[
-    {t:'cef',desc:'L4 — Cobertura 15%',val:126563,quando:'Mês 10',status:'pendente'},
-    {t:'cef',desc:'L5 — Instalações 15%',val:126563,quando:'Mês 12',status:'pendente'},
-    {t:'prop',desc:'Taxas + contabilidade + misc',val:3500,quando:'Mensal',status:'pendente'},
-  ]},
-  {label:'Revestimentos',sub:'M12–M15',proprio:2500,cef:168750,items:[
-    {t:'cef',desc:'L6 — Acabamentos 20%',val:168750,quando:'Mês 15',status:'pendente'},
-    {t:'prop',desc:'Taxas + misc',val:2500,quando:'Mensal',status:'pendente'},
-  ]},
-  {label:'Acabamentos',sub:'M16–M18',proprio:2500,cef:0,items:[{t:'prop',desc:'Taxas Alphaville + marketing + misc',val:2500,quando:'Mensal',status:'pendente'}]},
-  {label:'Entrega / Cartório',sub:'Q1/2028',proprio:28873,cef:0,items:[
-    {t:'prop',desc:'Habite-se',val:2000,quando:'Conclusão',status:'pendente'},
-    {t:'prop',desc:'Averbação construção',val:5000,quando:'Habite-se',status:'pendente'},
-    {t:'prop',desc:'ISS obra',val:16875,quando:'Fim obra',status:'pendente'},
-    {t:'prop',desc:'INSS da construção',val:4000,quando:'Obra',status:'pendente'},
-    {t:'prop',desc:'Marketing / misc',val:998,quando:'Venda',status:'pendente'},
-  ]},
-];
-let currentFilter='all', desembolsoChart=null;
-const fmtV=v=>'R$'+v.toLocaleString('pt-BR');
-
-function buildDesembolsoChart(){
-  if(desembolsoChart){desembolsoChart.destroy();desembolsoChart=null;}
-  const canvas=document.getElementById('chartDesembolso');
-  if(!canvas)return;
-  const pw=canvas.parentElement.offsetWidth;
-  if(pw>0){canvas.setAttribute('width',pw);canvas.setAttribute('height','300');}
-  const ctx=canvas.getContext('2d');
-  desembolsoChart=new Chart(ctx,{
-    data:{
-      labels:phases.map(p=>p.label),
-      datasets:[
-        {type:'bar',label:'Recursos Próprios',data:phases.map(p=>p.proprio),backgroundColor:'rgba(249,115,22,0.75)',borderColor:'rgba(249,115,22,1)',borderWidth:1,borderRadius:4,yAxisID:'y'},
-        {type:'bar',label:'Via CEF',data:phases.map(p=>p.cef),backgroundColor:'rgba(91,106,247,0.75)',borderColor:'rgba(91,106,247,1)',borderWidth:1,borderRadius:4,yAxisID:'y'},
-        {type:'line',label:'Acumulado',data:(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;})();}()),borderColor:'rgba(34,197,94,0.9)',backgroundColor:'rgba(34,197,94,0.1)',borderWidth:2,pointRadius:4,fill:false,tension:0.3,yAxisID:'y2'}
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{color:'#8892a4',font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtV(c.parsed.y)}`}}},
-      scales:{
-        x:{ticks:{color:'#8892a4',font:{size:10}},grid:{color:'rgba(45,49,72,0.5)'}},
-        y:{ticks:{color:'#8892a4',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(45,49,72,0.4)'},position:'left'},
-        y2:{ticks:{color:'rgba(34,197,94,0.8)',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{display:false},position:'right'}
-      }
-    }
-  });
-  setTimeout(()=>{if(desembolsoChart)desembolsoChart.resize();},60);
-  buildFaseContainer(currentFilter);
-}
-
-function setFilter(f,btn){
-  currentFilter=f;
-  document.querySelectorAll('#panel-desembolso .filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(desembolsoChart){
-    const ds=desembolsoChart.data.datasets;
-    if(f==='all'){ds[0].data=phases.map(p=>p.proprio);ds[1].data=phases.map(p=>p.cef);ds[0].hidden=false;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;})();}());}
-    else if(f==='prop'){ds[0].data=phases.map(p=>p.proprio);ds[1].hidden=true;ds[0].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio;return a;})();}());}
-    else{ds[1].data=phases.map(p=>p.cef);ds[0].hidden=true;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.cef;return a;})();}());}
-    desembolsoChart.update();
-  }
-  buildFaseContainer(f);
-}
-
-function buildFaseContainer(f){
-  const c=document.getElementById('fase-container'); c.innerHTML='';
-  phases.forEach((ph,pi)=>{
-    const items=f==='all'?ph.items:f==='prop'?ph.items.filter(i=>i.t==='prop'):ph.items.filter(i=>i.t==='cef');
-    if(!items.length)return;
-    const total=items.reduce((s,i)=>s+i.val,0);
-    const div=document.createElement('div'); div.className='phase-section';
-    div.innerHTML=`<div class="phase-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
-      <div class="phase-hdr-l"><span style="font-size:11px;background:var(--sur2);padding:2px 8px;border-radius:10px;color:var(--mut)">${pi+1}</span>${ph.label}${ph.urgente?' ⚠️':''}<span style="font-size:10px;color:var(--mut);font-weight:400">${ph.sub}</span></div>
-      <div class="phase-hdr-r">${ph.proprio>0&&(f==='all'||f==='prop')?`<span style="color:var(--org)">${fmtV(ph.proprio)} próprio</span>`:''}${ph.cef>0&&(f==='all'||f==='cef')?`<span style="color:var(--acc2)">${fmtV(ph.cef)} CEF</span>`:''}<span style="color:var(--mut)">▼</span></div>
-    </div>
-    <div class="phase-body">${items.map(it=>`<div class="detalhe-item"><div class="d-dot ${it.t==='prop'?'d-prop':'d-cef'}"></div><div style="flex:1"><div class="d-desc">${it.desc}</div></div><div class="d-quando">${it.quando}</div><div style="margin-left:8px">${it.status==='pago'?'<span class="tag tag-grn">Pago ✓</span>':it.status==='urgente'?'<span class="tag tag-red">Urgente</span>':'<span class="tag tag-gray">Pendente</span>'}</div><div class="d-val" style="margin-left:10px;color:${it.t==='prop'?'var(--org)':'var(--acc2)'}">${fmtV(it.val)}</div></div>`).join('')}
-    <div style="padding:8px 14px;font-size:11px;color:var(--mut);text-align:right;border-top:1px solid rgba(45,49,72,.3)">Subtotal: <strong style="color:var(--txt)">${fmtV(total)}</strong></div></div>`;
-    c.appendChild(div);
-  });
-}
-
-// ===== CHECKLIST =====
-const checklists=[
-  {title:'FASE 1 — Aprovação Crédito CPF',color:'var(--acc2)',items:[
-    {text:'Decore (Declaração Comprobatória de Percepção de Rendimentos)',sub:'Obrigatório para sócio/autônomo na CEF',done:false},
-    {text:'IRPF — Últimas 2 declarações com recibo',sub:'',done:false},
-    {text:'Extratos bancários PF — 3 meses',sub:'',done:false},
-    {text:'Extratos bancários PJ OTR — 6 meses',sub:'',done:false},
-    {text:'RG e CPF — Gabriel e Sofia',sub:'',done:false},
-    {text:'Certidão de casamento',sub:'',done:false},
-    {text:'Comprovante de endereço — 3 meses',sub:'',done:false},
-  ]},
-  {title:'FASE 2 — Protocolo CEF ⚠️ Até 12/05',color:'var(--red)',items:[
-    {text:'Contrato de Compra e Venda assinado',sub:'Compromisso_Compra_Venda_Alphaville_IV_Q15_L03_FINAL.pdf',done:true},
-    {text:'Recibo do sinal R$10.000',sub:'Pago 28/04/2026',done:true},
-    {text:'Matrícula atualizada — Mat. 244.050',sub:'Max 30 dias · CRI Campo Grande',done:false},
-    {text:'CND do vendedor (INSS, RF, Estadual, Municipal)',sub:'',done:false},
-    {text:'Declaração de ônus reais — cartório',sub:'',done:false},
-    {text:'PCI — Proposta de Construção Individual',sub:'Elaborada pelo arquiteto',done:false},
-    {text:'Projeto arquitetônico',sub:'',done:false},
-    {text:'Formulários de cadastro CEF',sub:'',done:false},
-  ]},
-  {title:'FASE 3 — Aprovação Financiamento (até 27/07)',color:'var(--ylw)',items:[
-    {text:'Laudo de avaliação CEF (R$2.000.000)',sub:'',done:false},
-    {text:'Projeto estrutural com ART CREA',sub:'',done:false},
-    {text:'Projetos hidr. e elétrico com ART/RRT',sub:'',done:false},
-    {text:'Memorial descritivo da obra',sub:'',done:false},
-    {text:'Orçamento analítico da obra',sub:'',done:false},
-    {text:'Cronograma físico-financeiro 18 meses',sub:'',done:false},
-    {text:'ART de execução da obra',sub:'',done:false},
-  ]},
-  {title:'FASE 4 — Início Obra e Medições',color:'var(--org)',items:[
-    {text:'Alvará de construção — SEMADUR',sub:'',done:false},
-    {text:'Aprovação Associação Alphaville CG4',sub:'',done:false},
-    {text:'Contrato empreiteiro / OTR Engenharia',sub:'',done:false},
-    {text:'Seguro de obra contratado',sub:'',done:false},
-    {text:'Liberações L1 a L6 (medições CEF)',sub:'6 etapas ao longo dos 18 meses',done:false},
-  ]},
-  {title:'FASE 5 — Entrega e Encerramento',color:'var(--grn)',items:[
-    {text:'Habite-se',sub:'',done:false},
-    {text:'ART de conclusão',sub:'',done:false},
-    {text:'Averbação construção — Mat. 244.050',sub:'',done:false},
-    {text:'Recolhimento INSS da construção',sub:'',done:false},
-    {text:'Escritura definitiva de compra e venda',sub:'',done:false},
-  ]},
-];
-const cstate={}, ccontainer=document.getElementById('checklist-container');
-let totalCk=0;
-checklists.forEach((gr,gi)=>{
-  const grp=document.createElement('div');grp.className='cbox';
-  const hdr=document.createElement('div');hdr.className='cbox-hdr';
-  hdr.innerHTML=`<div class="cbox-hdr-l"><span style="width:10px;height:10px;border-radius:50%;background:${gr.color};display:inline-block"></span>${gr.title}</div><span id="gc${gi}" style="font-size:11px;color:var(--mut)"></span>`;
-  hdr.onclick=()=>{const b=grp.querySelector('.cbox-body');b.style.display=b.style.display==='none'?'':'none';};
-  const body=document.createElement('div');body.className='cbox-body';
-  gr.items.forEach((it,ii)=>{
-    totalCk++;
-    const key=`${gi}-${ii}`;
-    const isDone=cstate[key]!==undefined?cstate[key]:it.done;
-    const el=document.createElement('div');el.className='citem';
-    el.innerHTML=`<div class="cb ${isDone?'checked':''}" id="cb${gi}${ii}"></div><div><div class="ctext" style="${isDone?'text-decoration:line-through;opacity:.55':''}" id="ct${gi}${ii}">${it.text}</div>${it.sub?`<div class="csub">${it.sub}</div>`:''}</div>`;
-    el.onclick=()=>{
-      const cb=document.getElementById(`cb${gi}${ii}`),ct=document.getElementById(`ct${gi}${ii}`),was=cb.classList.contains('checked');
-      cb.classList.toggle('checked');ct.style.textDecoration=was?'':'line-through';ct.style.opacity=was?'':'.55';
-      cstate[key]=!was;updateCkProgress();updateGc(gi);
-    };
-    body.appendChild(el);
-  });
-  grp.appendChild(hdr);grp.appendChild(body);ccontainer.appendChild(grp);
-});
-function updateGc(gi){let d=0;checklists[gi].items.forEach((_,ii)=>{if(document.getElementById(`cb${gi}${ii}`)?.classList.contains('checked'))d++;});const el=document.getElementById(`gc${gi}`);if(el)el.textContent=`${d}/${checklists[gi].items.length}`;}
-function updateCkProgress(){let c=0;document.querySelectorAll('.cb.checked').forEach(()=>c++);const pct=Math.round(c/totalCk*100);document.getElementById('check-progress').textContent=`${c} / ${totalCk} itens (${pct}%)`;document.getElementById('check-bar').style.width=pct+'%';}
-checklists.forEach((_,gi)=>updateGc(gi));
-updateCkProgress();
-</script>
-</body>
-</html>
+    html+=`<tr class="row-total"><td>SUBTOTAL</td><td>${fmt(catOrc)}</
