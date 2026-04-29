@@ -975,7 +975,6 @@ function buildDesembolsoChart(){
   if(desembolsoChart){desembolsoChart.destroy();desembolsoChart=null;}
   const canvas=document.getElementById('chartDesembolso');
   if(!canvas)return;
-  // força dimensões antes de criar o chart (evita 0x0 por display:none)
   const pw=canvas.parentElement.offsetWidth;
   if(pw>0){canvas.setAttribute('width',pw);canvas.setAttribute('height','300');}
   const ctx=canvas.getContext('2d');
