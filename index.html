@@ -83,7 +83,8 @@ tr:last-child td{border-bottom:none}
 .detalhe-item:last-child{border-bottom:none}
 .d-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .d-prop{background:var(--org)}.d-cef{background:var(--acc2)}
-.d-desc{flex:1;font-size:12px}.d-val{font-size:12px;font-weight:600;white-space:nowrap}
+.d-desc{flex:1;font-size:12px}.d-sub{font-size:10px;color:var(--mut)}
+.d-val{font-size:12px;font-weight:600;white-space:nowrap}
 .d-quando{font-size:10px;color:var(--mut);white-space:nowrap;margin-left:8px}
 .phase-section{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
 .phase-hdr{background:var(--sur2);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:8px}
@@ -117,14 +118,19 @@ tr:last-child td{border-bottom:none}
 .orc-table tr.row-red td{background:rgba(239,68,68,.04)}
 .orc-table tr.row-total{background:rgba(91,106,247,.07)}
 .orc-table tr.row-total td{font-weight:700;border-top:1px solid var(--bd)}
-.delta-grn{color:var(--grn);font-weight:600}.delta-red{color:var(--red);font-weight:600}.delta-neu{color:var(--mut)}
-.val-real{color:var(--grn);font-weight:600}.val-empty{color:var(--mut);font-style:italic}
+.delta-grn{color:var(--grn);font-weight:600}
+.delta-red{color:var(--red);font-weight:600}
+.delta-neu{color:var(--mut)}
+.val-real{color:var(--grn);font-weight:600}
+.val-empty{color:var(--mut);font-style:italic}
 .orc-obs{font-size:10px;color:var(--mut);margin-top:2px}
+/* FINANCEIRO */
 .fin-input{width:100%;background:var(--sur2);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;color:var(--txt);font-size:13px;outline:none;font-family:inherit}
 .fin-input:focus{border-color:var(--acc)}
 .fin-label{font-size:10px;color:var(--mut);margin-bottom:4px;display:block;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .btn-acc{background:var(--acc);color:#fff;border:none;border-radius:6px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s}
-.btn-acc:hover{background:var(--acc2)}.btn-acc:disabled{opacity:.5;cursor:not-allowed}
+.btn-acc:hover{background:var(--acc2)}
+.btn-acc:disabled{opacity:.5;cursor:not-allowed}
 .socio-card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:14px}
 .socio-card.me{border-color:var(--acc)}
 .socio-prog{background:var(--sur2);border-radius:4px;height:5px;margin-top:8px;overflow:hidden}
@@ -132,10 +138,15 @@ tr:last-child td{border-bottom:none}
 </style>
 </head>
 <body>
+
 <div class="hdr">
-  <div><h1>🏠 Casa Alphaville IV — Q15 L03</h1><p>OTR Engenharia · Rua Agave · 375m² · Mat. 244.050 · Campo Grande/MS</p></div>
+  <div>
+    <h1>🏠 Casa Alphaville IV — Q15 L03</h1>
+    <p>OTR Engenharia · Rua Agave · 375m² · Mat. 244.050 · Campo Grande/MS</p>
+  </div>
   <div class="badge">⚠️ Protocolo CEF — Até 12/05/2026</div>
 </div>
+
 <div class="tabs">
   <div class="tab active" onclick="setTab('visao',this)">Visão Geral</div>
   <div class="tab" onclick="setTab('financeiro',this)">💰 Financeiro</div>
@@ -146,11 +157,18 @@ tr:last-child td{border-bottom:none}
   <div class="tab" onclick="setTab('viabilidade',this)">Viabilidade</div>
   <div class="tab" onclick="setTab('parceiros',this)">Parceiros</div>
 </div>
+
 <div class="content">
 
 <!-- VISÃO GERAL -->
 <div class="panel active" id="panel-visao">
-  <div class="alert alert-red"><div class="alert-icon">🚨</div><div><div class="alert-title">AÇÃO URGENTE — Protocolar CEF até 12/05/2026</div><div class="alert-body">Contrato assinado 28/04/2026. Prazo: 10 dias úteis. Sinal R$10.000 pago. Aprovação de crédito CPF já solicitada. Não protocolar = risco de perda do sinal (cláusula 3.3).</div></div></div>
+  <div class="alert alert-red">
+    <div class="alert-icon">🚨</div>
+    <div>
+      <div class="alert-title">AÇÃO URGENTE — Protocolar CEF até 12/05/2026</div>
+      <div class="alert-body">Contrato assinado 28/04/2026. Prazo: 10 dias úteis. Sinal R$10.000 pago. Aprovação de crédito CPF já solicitada. Não protocolar = risco de perda do sinal (cláusula 3.3).</div>
+    </div>
+  </div>
   <div class="kpi-grid">
     <div class="kpi"><div class="kpi-lbl">Terreno</div><div class="kpi-val">375m²</div><div class="kpi-sub">Q15 L03 · R$400k</div></div>
     <div class="kpi"><div class="kpi-lbl">Área Construída</div><div class="kpi-val">187,5m²</div><div class="kpi-sub">Padrão alto · 3Q 2B 2G</div></div>
@@ -161,7 +179,8 @@ tr:last-child td{border-bottom:none}
     <div class="kpi kpi-blu"><div class="kpi-lbl">Financiamento CEF</div><div class="kpi-val">R$1,6M</div><div class="kpi-sub">80% · 30 anos · SBPE</div></div>
     <div class="kpi kpi-grn"><div class="kpi-lbl">Economia Projetos</div><div class="kpi-val">R$10.563</div><div class="kpi-sub">Cotações recebidas</div></div>
   </div>
-  <div class="sec"><div class="sec-ttl">Rastreador de Fases</div>
+  <div class="sec">
+    <div class="sec-ttl">Rastreador de Fases</div>
     <div class="fase-tracker">
       <div class="fase done"><div style="font-size:16px">✅</div><div><div class="fase-name">Contrato de Compra e Venda Assinado</div><div class="fase-desc">Sinal R$10.000 pago · Roberto Torres Neto</div></div><div class="fase-date">28/04/2026</div></div>
       <div class="fase done"><div style="font-size:16px">✅</div><div><div class="fase-name">Aprovação de Crédito CPF Solicitada</div><div class="fase-desc">CPF Gabriel Acioly · Aguardando retorno CEF</div></div><div class="fase-date">Em andamento</div></div>
@@ -178,15 +197,32 @@ tr:last-child td{border-bottom:none}
 
 <!-- FINANCEIRO -->
 <div class="panel" id="panel-financeiro">
+
+  <!-- SETUP -->
   <div id="fin-setup" style="display:none">
-    <div class="alert alert-blu"><div class="alert-icon">⚙️</div><div><div class="alert-title">Configure a conexão com o Google Sheets</div><div class="alert-body">Você precisa criar e publicar o Apps Script uma vez. Depois cole a URL abaixo — fica salvo neste browser.</div></div></div>
+    <div class="alert alert-blu">
+      <div class="alert-icon">⚙️</div>
+      <div>
+        <div class="alert-title">Configure a conexão com o Google Sheets</div>
+        <div class="alert-body">Você precisa criar e publicar o Apps Script uma vez. Depois cole a URL abaixo — fica salvo neste browser.</div>
+      </div>
+    </div>
     <div class="card" style="margin-top:14px">
       <div style="font-size:12px;font-weight:700;margin-bottom:12px">URL do Apps Script</div>
       <input id="fin-url-input" class="fin-input" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:10px">
       <button class="btn-acc" onclick="saveFinUrl()" style="width:100%">Ativar controle financeiro</button>
     </div>
-    <div class="note" style="margin-top:12px">📋 <strong>Passo a passo:</strong><br>1. Abra o Google Sheet · 2. Extensions → Apps Script · 3. Cole apps-script-pagamentos.gs · 4. Deploy → New deployment → Web App → Execute as: Me · Access: Anyone · 5. Copie a URL</div>
+    <div class="note" style="margin-top:12px">
+      📋 <strong>Passo a passo:</strong><br>
+      1. Abra o Google Sheet que usará para o projeto<br>
+      2. Menu Extensions → Apps Script<br>
+      3. Cole o código do arquivo <strong>apps-script-pagamentos.gs</strong><br>
+      4. Deploy → New deployment → Web App → Execute as: Me · Access: Anyone → Deploy<br>
+      5. Copie a URL gerada e cole aqui acima
+    </div>
   </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
   <div id="fin-content" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
       <div id="fin-status" style="font-size:11px;color:var(--mut)">Carregando...</div>
@@ -196,8 +232,17 @@ tr:last-child td{border-bottom:none}
         <button class="filter-btn" onclick="resetFinConfig()" style="padding:6px 10px" title="Reconfigurar URL">⚙️</button>
       </div>
     </div>
+
+    <!-- KPIs -->
     <div class="kpi-grid" id="fin-kpis"></div>
-    <div class="sec"><div class="sec-ttl">Posição por Sócio (33,33% cada)</div><div class="grid3" id="fin-socios"></div></div>
+
+    <!-- Cards sócios -->
+    <div class="sec">
+      <div class="sec-ttl">Posição por Sócio (33,33% cada)</div>
+      <div class="grid3" id="fin-socios"></div>
+    </div>
+
+    <!-- Histórico -->
     <div class="sec">
       <div class="sec-ttl">Histórico de Movimentações</div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
@@ -205,30 +250,85 @@ tr:last-child td{border-bottom:none}
         <button class="filter-btn" id="fin-f-saida" onclick="setFinFilter('saida',this)">↑ Saídas</button>
         <button class="filter-btn" id="fin-f-entrada" onclick="setFinFilter('entrada',this)">↓ Entradas</button>
       </div>
-      <div class="tbl-wrap"><table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th>De / Para</th><th>Doc</th></tr></thead><tbody id="fin-table-body"></tbody></table></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Data</th><th>Tipo</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th>De / Para</th><th>Doc</th>
+          </tr></thead>
+          <tbody id="fin-table-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
+
+  <!-- MODAL FORM -->
   <div id="fin-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:16px">
     <div style="background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:20px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div style="font-weight:700;font-size:14px">Registrar Movimentação</div>
         <button onclick="closePaymentForm()" style="background:none;border:none;color:var(--mut);font-size:20px;cursor:pointer;line-height:1">✕</button>
       </div>
-      <div style="margin-bottom:12px"><label class="fin-label">Tipo</label><select id="fin-form-tipo" class="fin-input" onchange="toggleDeParaField()"><option value="SAIDA">↑ Saída — Paguei fornecedor</option><option value="ENTRADA">↓ Entrada — Sócio me pagou</option></select></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div><label class="fin-label">Data</label><input id="fin-form-data" type="date" class="fin-input"></div>
-        <div><label class="fin-label">Valor (R$)</label><input id="fin-form-valor" type="number" step="0.01" min="0" class="fin-input" placeholder="0,00"></div>
+
+      <div style="margin-bottom:12px">
+        <label class="fin-label">Tipo</label>
+        <select id="fin-form-tipo" class="fin-input" onchange="toggleDeParaField()">
+          <option value="SAIDA">↑ Saída — Paguei fornecedor</option>
+          <option value="ENTRADA">↓ Entrada — Sócio me pagou</option>
+        </select>
       </div>
-      <div style="margin-bottom:12px"><label class="fin-label">Descrição</label><input id="fin-form-desc" class="fin-input" placeholder="Ex: Sinal terreno, Projeto arquitetônico…"></div>
+
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div><label class="fin-label">Categoria</label><select id="fin-form-cat" class="fin-input"><option value="Terreno">Terreno</option><option value="Projetos">Projetos</option><option value="Obra">Obra</option><option value="Taxas">Taxas</option><option value="Outros">Outros</option></select></div>
         <div>
-          <div id="fin-depa-saida"><label class="fin-label">Fornecedor</label><input id="fin-form-fornecedor" class="fin-input" placeholder="Nome do fornecedor"></div>
-          <div id="fin-depa-entrada" style="display:none"><label class="fin-label">Sócio</label><select id="fin-form-socio" class="fin-input"><option value="Gilberto Costa">Gilberto Costa</option><option value="Raphael Alves">Raphael Alves</option></select></div>
+          <label class="fin-label">Data</label>
+          <input id="fin-form-data" type="date" class="fin-input">
+        </div>
+        <div>
+          <label class="fin-label">Valor (R$)</label>
+          <input id="fin-form-valor" type="number" step="0.01" min="0" class="fin-input" placeholder="0,00">
         </div>
       </div>
-      <div style="margin-bottom:12px"><label class="fin-label">Referência do Documento</label><input id="fin-form-doc" class="fin-input" placeholder="Link Google Drive, nº NF, localização física…"></div>
-      <div style="margin-bottom:16px"><label class="fin-label">Observações</label><input id="fin-form-obs" class="fin-input" placeholder="Opcional"></div>
+
+      <div style="margin-bottom:12px">
+        <label class="fin-label">Descrição</label>
+        <input id="fin-form-desc" class="fin-input" placeholder="Ex: Sinal terreno, Projeto arquitetônico…">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label class="fin-label">Categoria</label>
+          <select id="fin-form-cat" class="fin-input">
+            <option value="Terreno">Terreno</option>
+            <option value="Projetos">Projetos</option>
+            <option value="Obra">Obra</option>
+            <option value="Taxas">Taxas</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+        <div>
+          <div id="fin-depa-saida">
+            <label class="fin-label">Fornecedor</label>
+            <input id="fin-form-fornecedor" class="fin-input" placeholder="Nome do fornecedor">
+          </div>
+          <div id="fin-depa-entrada" style="display:none">
+            <label class="fin-label">Sócio</label>
+            <select id="fin-form-socio" class="fin-input">
+              <option value="Gilberto Costa">Gilberto Costa</option>
+              <option value="Raphael Alves">Raphael Alves</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px">
+        <label class="fin-label">Referência do Documento</label>
+        <input id="fin-form-doc" class="fin-input" placeholder="Link Google Drive, nº NF, localização física…">
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label class="fin-label">Observações</label>
+        <input id="fin-form-obs" class="fin-input" placeholder="Opcional">
+      </div>
+
       <div style="display:flex;gap:8px">
         <button onclick="closePaymentForm()" class="filter-btn" style="flex:1">Cancelar</button>
         <button id="fin-submit-btn" class="btn-acc" onclick="submitPayment()" style="flex:2">Registrar</button>
@@ -258,11 +358,14 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div class="sec"><div class="sec-ttl">Prazos Contratuais</div>
-    <div class="tbl-wrap"><table><thead><tr><th>Prazo</th><th>Período</th><th>Data Limite</th><th>Consequência</th></tr></thead><tbody>
-      <tr><td>Protocolo do financiamento na CEF</td><td>10 dias úteis</td><td style="color:var(--red);font-weight:700">12/05/2026</td><td>Perda do sinal R$10.000</td></tr>
-      <tr><td>Aprovação do financiamento CEF</td><td>90 dias corridos</td><td>27/07/2026</td><td>Devolução do sinal se negado</td></tr>
-      <tr><td>Prazo de obras</td><td>18 meses</td><td>~Q1 2028</td><td>Multa R$40.000 por descumprimento</td></tr>
-    </tbody></table></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Prazo</th><th>Período</th><th>Data Limite</th><th>Consequência</th></tr></thead>
+      <tbody>
+        <tr><td>Protocolo do financiamento na CEF</td><td>10 dias úteis</td><td style="color:var(--red);font-weight:700">12/05/2026</td><td>Perda do sinal R$10.000</td></tr>
+        <tr><td>Aprovação do financiamento CEF</td><td>90 dias corridos</td><td>27/07/2026</td><td>Devolução do sinal se negado</td></tr>
+        <tr><td>Prazo de obras</td><td>18 meses</td><td>~Q1 2028</td><td>Multa R$40.000 por descumprimento</td></tr>
+      </tbody>
+    </table></div>
   </div>
   <div class="sec"><div class="sec-ttl">Cláusulas Relevantes</div>
     <div class="grid2">
@@ -276,7 +379,13 @@ tr:last-child td{border-bottom:none}
 
 <!-- DESEMBOLSO -->
 <div class="panel" id="panel-desembolso">
-  <div class="alert alert-ylw"><div class="alert-icon">💰</div><div><div class="alert-title">Desembolso Real: Recursos Próprios vs. Financiamento CEF</div><div class="alert-body">Próprio = caixa OTR/Gabriel (~R$118k). CEF = liberações por medição. Buffer disponível no limite R$1,6M: R$366.250.</div></div></div>
+  <div class="alert alert-ylw">
+    <div class="alert-icon">💰</div>
+    <div>
+      <div class="alert-title">Desembolso Real: Recursos Próprios vs. Financiamento CEF</div>
+      <div class="alert-body">Próprio = caixa OTR/Gabriel (~R$118k). CEF = liberações por medição. Buffer disponível no limite R$1,6M: R$366.250.</div>
+    </div>
+  </div>
   <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">
     <div class="kpi kpi-org"><div class="kpi-lbl">💼 Recursos Próprios</div><div class="kpi-val">R$117.698</div><div class="kpi-sub">7,2% do custo total</div></div>
     <div class="kpi kpi-blu"><div class="kpi-lbl">🏦 Via CEF (Previsto)</div><div class="kpi-val">R$1.233.750</div><div class="kpi-sub">Terreno + 6 liberações</div></div>
@@ -292,24 +401,37 @@ tr:last-child td{border-bottom:none}
     <div style="font-size:11px;color:var(--mut);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Desembolso por Fase — Próprio vs CEF (R$)</div>
     <div style="position:relative;height:300px"><canvas id="chartDesembolso"></canvas></div>
   </div>
-  <div class="sec"><div class="sec-ttl">Detalhamento por Fase</div><div id="fase-container"></div></div>
-  <div class="sec"><div class="sec-ttl">Liberações CEF — 6 Medições</div>
-    <div class="tbl-wrap"><table><thead><tr><th>Liberação</th><th>Gatilho Físico</th><th>%</th><th>Valor</th><th>Mês</th></tr></thead><tbody>
-      <tr><td><strong>L0</strong></td><td>Escritura / aprovação CEF</td><td>—</td><td style="color:var(--acc2)"><strong>R$390.000</strong></td><td>Aprovação</td></tr>
-      <tr><td><strong>L1</strong></td><td>Fundação concluída</td><td>10%</td><td style="color:var(--acc2)"><strong>R$84.375</strong></td><td>M3</td></tr>
-      <tr><td><strong>L2</strong></td><td>Estrutura concluída</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M6</td></tr>
-      <tr><td><strong>L3</strong></td><td>Alvenaria concluída</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M8</td></tr>
-      <tr><td><strong>L4</strong></td><td>Cobertura concluída</td><td>15%</td><td style="color:var(--acc2)"><strong>R$126.563</strong></td><td>M10</td></tr>
-      <tr><td><strong>L5</strong></td><td>Instalações concluídas</td><td>15%</td><td style="color:var(--acc2)"><strong>R$126.563</strong></td><td>M12</td></tr>
-      <tr><td><strong>L6</strong></td><td>Acabamentos + Habite-se</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M18</td></tr>
-    </tbody></table></div>
+  <div class="sec">
+    <div class="sec-ttl">Detalhamento por Fase</div>
+    <div id="fase-container"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl">Liberações CEF — 6 Medições</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Liberação</th><th>Gatilho Físico</th><th>%</th><th>Valor</th><th>Mês</th></tr></thead>
+      <tbody>
+        <tr><td><strong>L0</strong></td><td>Escritura / aprovação CEF</td><td>—</td><td style="color:var(--acc2)"><strong>R$390.000</strong></td><td>Aprovação</td></tr>
+        <tr><td><strong>L1</strong></td><td>Fundação concluída</td><td>10%</td><td style="color:var(--acc2)"><strong>R$84.375</strong></td><td>M3</td></tr>
+        <tr><td><strong>L2</strong></td><td>Estrutura concluída</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M6</td></tr>
+        <tr><td><strong>L3</strong></td><td>Alvenaria concluída</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M8</td></tr>
+        <tr><td><strong>L4</strong></td><td>Cobertura concluída</td><td>15%</td><td style="color:var(--acc2)"><strong>R$126.563</strong></td><td>M10</td></tr>
+        <tr><td><strong>L5</strong></td><td>Instalações concluídas</td><td>15%</td><td style="color:var(--acc2)"><strong>R$126.563</strong></td><td>M12</td></tr>
+        <tr><td><strong>L6</strong></td><td>Acabamentos + Habite-se</td><td>20%</td><td style="color:var(--acc2)"><strong>R$168.750</strong></td><td>M18</td></tr>
+      </tbody>
+    </table></div>
   </div>
   <div class="note">⚠️ Juros de obra (~R$127.849 total durante 18 meses) estão dentro do buffer de R$366.250 — incorporados ao saldo devedor, não impactam o caixa diretamente.</div>
 </div>
 
 <!-- ORÇAMENTO VS REAL -->
 <div class="panel" id="panel-orcamento">
-  <div class="alert alert-grn"><div class="alert-icon">📊</div><div><div class="alert-title">Orçamento vs Cotação vs Real — Custos Indiretos e Diretos</div><div class="alert-body">Cotações de projetos resultam em <strong>economia líquida de R$10.563</strong> vs orçamento.</div></div></div>
+  <div class="alert alert-grn">
+    <div class="alert-icon">📊</div>
+    <div>
+      <div class="alert-title">Orçamento vs Cotação vs Real — Custos Indiretos e Diretos</div>
+      <div class="alert-body">Orçado = referência da planilha Viabilidade_Alpha_4. Cotado = proposta recebida. Real = valor efetivamente pago. Cotações de projetos resultam em <strong>economia líquida de R$10.563</strong> vs orçamento.</div>
+    </div>
+  </div>
   <div class="kpi-grid" id="orc-kpis"></div>
   <div class="filter-row" id="orc-filter-row">
     <button class="filter-btn f-all active" onclick="orcFilter('all',this)">Todos</button>
@@ -323,7 +445,7 @@ tr:last-child td{border-bottom:none}
     <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,.12);display:inline-block;border:1px solid rgba(239,68,68,.3)"></span> Cotação acima do orçamento</span>
   </div>
   <div id="orc-tables"></div>
-  <div class="note" style="margin-top:14px">💡 Arquitetônico: orçado R$30.000 → cotado R$18.000 (<span style="color:var(--grn)">−R$12.000</span>). Estrutural+Hidr+Elét: orçado R$7.000 → cotado R$8.437,50 (<span style="color:var(--red)">+R$1.437,50</span>). Economia: <span style="color:var(--grn)"><strong>R$10.562,50 (−28,5%)</strong></span>.</div>
+  <div class="note" style="margin-top:14px">💡 <strong>Projetos (cotações recebidas):</strong> Arquitetônico: orçado R$30.000 → cotado R$18.000 (<span style="color:var(--grn)">−R$12.000</span>). Estrutural+Hidr+Elét: orçado R$7.000 → cotado R$8.437,50 (<span style="color:var(--red)">+R$1.437,50</span>). Economia líquida: <span style="color:var(--grn)"><strong>R$10.562,50 (−28,5%)</strong></span>.</div>
 </div>
 
 <!-- CHECKLIST -->
@@ -404,7 +526,8 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-</div>
+</div><!-- /content -->
+
 <script>
 // ===== NAV =====
 function setTab(name, el) {
@@ -413,8 +536,8 @@ function setTab(name, el) {
   el.classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
   if (name === 'desembolso') { clearTimeout(window._chartT); window._chartT = setTimeout(buildDesembolsoChart, 150); }
-  if (name === 'orcamento'  && !window.orcBuilt) buildOrcamento();
-  if (name === 'financeiro' && !window.finInit)  { window.finInit = true; initFinanceiro(); }
+  if (name === 'orcamento'  && !window.orcBuilt)   buildOrcamento();
+  if (name === 'financeiro' && !window.finInit)    { window.finInit = true; initFinanceiro(); }
 }
 
 const fmt  = v => v == null ? '—' : 'R$' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:2});
@@ -425,186 +548,236 @@ const fmtD = v => {
 };
 
 // ===== FINANCEIRO =====
-const FIN_URL_KEY = 'otr_alphaville_api_url';
-const SOCIOS = ['Gilberto Costa', 'Raphael Alves'];
-const GABRIEL = 'Gabriel Acioly';
-const SHARE = 1 / 3;
-let finData = [], finFilter = 'all', finApiUrl = '';
+const FIN_URL_KEY  = 'otr_alphaville_api_url';
+const SOCIOS       = ['Gilberto Costa', 'Raphael Alves'];
+const GABRIEL      = 'Gabriel Acioly';
+const SHARE        = 1 / 3;
+let finData        = [];
+let finFilter      = 'all';
+let finApiUrl      = '';
 
 function initFinanceiro() {
   finApiUrl = localStorage.getItem(FIN_URL_KEY) || '';
   if (!finApiUrl) {
-    document.getElementById('fin-setup').style.display = 'block';
+    document.getElementById('fin-setup').style.display   = 'block';
     document.getElementById('fin-content').style.display = 'none';
   } else {
-    document.getElementById('fin-setup').style.display = 'none';
+    document.getElementById('fin-setup').style.display   = 'none';
     document.getElementById('fin-content').style.display = 'block';
-    loadAllData();
+    loadFinData();
   }
 }
+
 function saveFinUrl() {
   const url = document.getElementById('fin-url-input').value.trim();
   if (!url) return;
   localStorage.setItem(FIN_URL_KEY, url);
-  finApiUrl = url; window.finInit = false; initFinanceiro();
+  finApiUrl = url;
+  window.finInit = false;
+  initFinanceiro();
 }
+
 function resetFinConfig() {
-  localStorage.removeItem(FIN_URL_KEY); finApiUrl = '';
-  document.getElementById('fin-setup').style.display = 'block';
+  localStorage.removeItem(FIN_URL_KEY);
+  finApiUrl = '';
+  document.getElementById('fin-setup').style.display   = 'block';
   document.getElementById('fin-content').style.display = 'none';
 }
-function reloadFin() { loadAllData(); }
 
-const toNum  = v => (v===''||v===null||v===false||v===undefined||isNaN(parseFloat(v))) ? null : parseFloat(v);
-const toBool = v => v===true||v==='TRUE'||v==='true'||v===1;
-
-// ===== PARSERS: Sheets → estruturas do dashboard =====
-function parseOrcamento(rows) {
-  const cats = {}, catOrder = [];
-  rows.forEach(row => {
-    const id = row.cat_id;
-    if (!cats[id]) { cats[id] = {id, label: row.cat_label, items: []}; catOrder.push(id); }
-    cats[id].items.push({ desc: row.desc||'', orc: toNum(row.orc)||0, cot: toNum(row.cot), real: toNum(row.real), obs: row.obs||'' });
-  });
-  return catOrder.map(id => cats[id]);
-}
-function parseDesembolso(rows) {
-  const phs = {}, phOrder = [];
-  rows.forEach(row => {
-    const fi = parseInt(row.fi);
-    if (!phs[fi]) { phs[fi] = {label:row.label, sub:row.sub, urgente:toBool(row.urgente), proprio:0, cef:0, items:[]}; phOrder.push(fi); }
-    const val = parseFloat(row.val)||0;
-    if (row.tipo==='prop') phs[fi].proprio += val; else if (row.tipo==='cef') phs[fi].cef += val;
-    phs[fi].items.push({t:row.tipo, desc:row.desc, val, quando:row.quando, status:row.status||'pendente'});
-  });
-  return phOrder.sort((a,b)=>a-b).map(fi=>phs[fi]);
-}
-function parseChecklist(rows) {
-  const groups = {}, grOrder = [];
-  rows.forEach(row => {
-    const gi = parseInt(row.gi);
-    if (!groups[gi]) { groups[gi] = {title:row.titulo, color:row.cor, items:[]}; grOrder.push(gi); }
-    groups[gi].items.push({text:row.texto, sub:row.sub||'', done:toBool(row.done)});
-  });
-  return grOrder.sort((a,b)=>a-b).map(gi=>groups[gi]);
+function reloadFin() {
+  loadFinData();
 }
 
+// JSONP helper — bypassa CORS do Apps Script
 function gsFetch(url, cb) {
-  var name = '_gs_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), s = document.createElement('script'), done = false;
-  window[name] = function(data) { done=true; delete window[name]; if(s.parentNode)s.parentNode.removeChild(s); cb(data); };
-  s.onerror = function() { if(done)return; done=true; delete window[name]; if(s.parentNode)s.parentNode.removeChild(s); cb(null); };
+  var name = '_gs_' + Date.now();
+  var s    = document.createElement('script');
+  var done = false;
+  window[name] = function(data) {
+    done = true;
+    delete window[name];
+    if (s.parentNode) s.parentNode.removeChild(s);
+    cb(data);
+  };
+  s.onerror = function() {
+    if (done) return;
+    done = true;
+    delete window[name];
+    if (s.parentNode) s.parentNode.removeChild(s);
+    cb(null);
+  };
   s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + name;
   document.body.appendChild(s);
 }
 
-function loadAllData() {
+function loadFinData() {
   document.getElementById('fin-status').textContent = 'Carregando dados…';
-  gsFetch(finApiUrl + '?action=read_all', function(json) {
-    if (!json || !json.ok) {
+  gsFetch(finApiUrl + '?action=read', function(json) {
+    if (!json) {
       document.getElementById('fin-status').textContent = 'Erro ao carregar. Verifique a URL.';
       return;
     }
-    finData = Array.isArray(json.pagamentos) ? json.pagamentos : [];
+    finData = Array.isArray(json.data) ? json.data : [];
     document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
-    if (Array.isArray(json.orcamento) && json.orcamento.length) {
-      orcCategories = parseOrcamento(json.orcamento);
-      window.orcBuilt = false;
-    }
-    if (Array.isArray(json.desembolso) && json.desembolso.length) {
-      phases = parseDesembolso(json.desembolso);
-    }
-    if (Array.isArray(json.checklist) && json.checklist.length) {
-      checklists = parseChecklist(json.checklist);
-      buildChecklist();
-    }
     renderFinanceiro();
-    if (document.getElementById('panel-desembolso').classList.contains('active')) {
-      clearTimeout(window._chartT); window._chartT = setTimeout(buildDesembolsoChart, 150);
-    }
-    if (document.getElementById('panel-orcamento').classList.contains('active')) {
-      window.orcBuilt = false; buildOrcamento();
-    }
   });
 }
 
 function renderFinanceiro() {
-  const saidas = finData.filter(r => r.tipo === 'SAIDA');
+  const saidas   = finData.filter(r => r.tipo === 'SAIDA');
   const entradas = finData.filter(r => r.tipo === 'ENTRADA');
   const totSaida = saidas.reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
   const totEntr  = entradas.reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
-  const quota = totSaida * SHARE;
+  const quota    = totSaida * SHARE;
   const pendente = totSaida * (1 - SHARE) - totEntr;
+
   document.getElementById('fin-kpis').innerHTML = `
-    <div class="kpi kpi-red"><div class="kpi-lbl">Total Pago (Gabriel)</div><div class="kpi-val">${fmt(totSaida)}</div><div class="kpi-sub">Todas as saídas realizadas</div></div>
+    <div class="kpi kpi-red"><div class="kpi-lbl">💸 Total Pago (Gabriel)</div><div class="kpi-val">${fmt(totSaida)}</div><div class="kpi-sub">Todas as saídas realizadas</div></div>
     <div class="kpi kpi-grn"><div class="kpi-lbl">Recebido dos Sócios</div><div class="kpi-val">${fmt(totEntr)}</div><div class="kpi-sub">Aportes recebidos</div></div>
-    <div class="kpi kpi-ylw"><div class="kpi-lbl">A Receber</div><div class="kpi-val">${fmt(Math.max(0, pendente))}</div><div class="kpi-sub">Quota sócios − recebido</div></div>
-    <div class="kpi kpi-blu"><div class="kpi-lbl">Quota por Sócio</div><div class="kpi-val">${fmt(quota)}</div><div class="kpi-sub">33,33% do total pago</div></div>
+    <div class="kpi kpi-ylw"><div class="kpi-lbl">⏳ A Receber</div><div class="kpi-val">${fmt(Math.max(0, pendente))}</div><div class="kpi-sub">Quota sócios − recebido</div></div>
+    <div class="kpi kpi-blu"><div class="kpi-lbl">📐 Quota por Sócio</div><div class="kpi-val">${fmt(quota)}</div><div class="kpi-sub">33,33% do total pago</div></div>
   `;
+
   const cards = [];
-  const gabAdiantado = totSaida - quota - totEntr;
-  cards.push(`<div class="socio-card me"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">👤</span><div><div style="font-weight:700;font-size:13px">${GABRIEL}</div><div style="font-size:10px;color:var(--acc2)">Você · Gestor financeiro</div></div></div><div class="vrow"><span style="color:var(--mut)">Total desembolsado</span><span style="color:var(--red);font-weight:600">${fmt(totSaida)}</span></div><div class="vrow"><span style="color:var(--mut)">Sua quota (33,3%)</span><span>${fmt(quota)}</span></div><div class="vrow"><span style="color:var(--mut)">Adiantado p/ sócios</span><span style="color:var(--ylw);font-weight:600">${fmt(Math.max(0, gabAdiantado))}</span></div></div>`);
+  const gabrielAdiantado = totSaida - quota - totEntr;
+  cards.push(`
+    <div class="socio-card me">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:18px">👤</span>
+        <div>
+          <div style="font-weight:700;font-size:13px">${GABRIEL}</div>
+          <div style="font-size:10px;color:var(--acc2)">Você · Gestor financeiro</div>
+        </div>
+      </div>
+      <div class="vrow"><span style="color:var(--mut)">Total desembolsado</span><span style="color:var(--red);font-weight:600">${fmt(totSaida)}</span></div>
+      <div class="vrow"><span style="color:var(--mut)">Sua quota (33,3%)</span><span>${fmt(quota)}</span></div>
+      <div class="vrow"><span style="color:var(--mut)">Adiantado p/ sócios</span><span style="color:var(--ylw);font-weight:600">${fmt(Math.max(0, gabrielAdiantado))}</span></div>
+    </div>
+  `);
+
   SOCIOS.forEach(nome => {
-    const pago = entradas.filter(r => r.de_para === nome).reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
-    const saldo = quota - pago, pct = quota > 0 ? Math.min(100, (pago/quota)*100) : 0, ok = saldo <= 0;
-    cards.push(`<div class="socio-card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">👤</span><div><div style="font-weight:700;font-size:13px">${nome}</div><div style="font-size:10px;color:var(--mut)">Sócio · 33,33%</div></div></div><div class="vrow"><span style="color:var(--mut)">Quota devida</span><span>${fmt(quota)}</span></div><div class="vrow"><span style="color:var(--mut)">Pago</span><span style="color:var(--grn);font-weight:600">${fmt(pago)}</span></div><div class="vrow"><span style="color:var(--mut)">Saldo</span><span style="color:${ok?'var(--grn)':'var(--red)'};font-weight:700">${ok?'✓ Quitado':fmt(saldo)+' ▲'}</span></div><div class="socio-prog"><div class="socio-fill" style="width:${pct.toFixed(0)}%"></div></div><div style="font-size:10px;color:var(--mut);margin-top:4px">${pct.toFixed(1)}% pago</div></div>`);
+    const pago  = entradas.filter(r => r.de_para === nome).reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
+    const saldo = quota - pago;
+    const pct   = quota > 0 ? Math.min(100, (pago / quota) * 100) : 0;
+    const ok    = saldo <= 0;
+    cards.push(`
+      <div class="socio-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:18px">👤</span>
+          <div>
+            <div style="font-weight:700;font-size:13px">${nome}</div>
+            <div style="font-size:10px;color:var(--mut)">Sócio · 33,33%</div>
+          </div>
+        </div>
+        <div class="vrow"><span style="color:var(--mut)">Quota devida</span><span>${fmt(quota)}</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Pago</span><span style="color:var(--grn);font-weight:600">${fmt(pago)}</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Saldo</span><span style="color:${ok ? 'var(--grn)' : 'var(--red)'};font-weight:700">${ok ? '✓ Quitado' : fmt(saldo) + ' ▲'}</span></div>
+        <div class="socio-prog"><div class="socio-fill" style="width:${pct.toFixed(0)}%"></div></div>
+        <div style="font-size:10px;color:var(--mut);margin-top:4px">${pct.toFixed(1)}% pago</div>
+      </div>
+    `);
   });
+
   document.getElementById('fin-socios').innerHTML = cards.join('');
   renderFinTable();
 }
 
 function renderFinTable() {
-  const filtered = finFilter === 'all' ? finData : finFilter === 'saida' ? finData.filter(r => r.tipo === 'SAIDA') : finData.filter(r => r.tipo === 'ENTRADA');
+  const filtered = finFilter === 'all' ? finData
+    : finFilter === 'saida'   ? finData.filter(r => r.tipo === 'SAIDA')
+    : finData.filter(r => r.tipo === 'ENTRADA');
+
   const rows = filtered.slice().reverse().map(r => {
     const isSaida = r.tipo === 'SAIDA';
-    const dataFmt = (String(r.data||'').slice(0,10)||'').split('-').reverse().join('/') || '—';
-    const docCell = r.doc_ref ? (r.doc_ref.startsWith('http') ? `<a href="${r.doc_ref}" target="_blank" style="color:var(--acc2);text-decoration:none">🔗 Ver</a>` : `<span style="color:var(--mut);font-size:10px">${r.doc_ref}</span>`) : '<span style="color:var(--mut)">—</span>';
-    return `<tr><td style="white-space:nowrap">${dataFmt}</td><td><span class="tag ${isSaida?'tag-red':'tag-grn'}">${isSaida?'↑ SAÍDA':'↓ ENTRADA'}</span></td><td>${r.descricao||'—'}</td><td><span class="tag tag-gray">${r.categoria||'—'}</span></td><td style="font-weight:600;color:${isSaida?'var(--red)':'var(--grn)'};white-space:nowrap">${isSaida?'−':'+'}${fmt(parseFloat(r.valor)||0)}</td><td style="color:var(--mut)">${r.de_para||'—'}</td><td>${docCell}</td></tr>`;
+    const dataStr = String(r.data || '').slice(0, 10);
+    const dataFmt = dataStr ? dataStr.split('-').reverse().join('/') : '—';
+    const docCell = r.doc_ref
+      ? (r.doc_ref.startsWith('http') ? `<a href="${r.doc_ref}" target="_blank" style="color:var(--acc2);text-decoration:none">🔗 Ver</a>` : `<span style="color:var(--mut);font-size:10px">${r.doc_ref}</span>`)
+      : '<span style="color:var(--mut)">—</span>';
+    return `<tr>
+      <td style="white-space:nowrap">${dataFmt}</td>
+      <td><span class="tag ${isSaida ? 'tag-red' : 'tag-grn'}">${isSaida ? '↑ SAÍDA' : '↓ ENTRADA'}</span></td>
+      <td>${r.descricao || '—'}</td>
+      <td><span class="tag tag-gray">${r.categoria || '—'}</span></td>
+      <td style="font-weight:600;color:${isSaida ? 'var(--red)' : 'var(--grn)'};white-space:nowrap">${isSaida ? '−' : '+'}${fmt(parseFloat(r.valor) || 0)}</td>
+      <td style="color:var(--mut)">${r.de_para || '—'}</td>
+      <td>${docCell}</td>
+    </tr>`;
   }).join('');
-  document.getElementById('fin-table-body').innerHTML = rows || '<tr><td colspan="7" style="text-align:center;color:var(--mut);padding:20px">Nenhum registro ainda</td></tr>';
+
+  document.getElementById('fin-table-body').innerHTML = rows ||
+    '<tr><td colspan="7" style="text-align:center;color:var(--mut);padding:20px">Nenhum registro ainda</td></tr>';
 }
+
 function setFinFilter(f, btn) {
   finFilter = f;
   document.querySelectorAll('#panel-financeiro .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); renderFinTable();
+  btn.classList.add('active');
+  renderFinTable();
 }
+
+// ===== MODAL FORM =====
 function openPaymentForm() {
   document.getElementById('fin-modal').style.display = 'flex';
-  document.getElementById('fin-form-data').value = new Date().toISOString().slice(0,10);
-  ['fin-form-desc','fin-form-valor','fin-form-doc','fin-form-obs'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('fin-form-tipo').value = 'SAIDA'; toggleDeParaField();
+  document.getElementById('fin-form-data').value     = new Date().toISOString().slice(0, 10);
+  document.getElementById('fin-form-desc').value     = '';
+  document.getElementById('fin-form-valor').value    = '';
+  document.getElementById('fin-form-doc').value      = '';
+  document.getElementById('fin-form-obs').value      = '';
+  document.getElementById('fin-form-tipo').value     = 'SAIDA';
+  toggleDeParaField();
 }
-function closePaymentForm() { document.getElementById('fin-modal').style.display = 'none'; }
+
+function closePaymentForm() {
+  document.getElementById('fin-modal').style.display = 'none';
+}
+
 function toggleDeParaField() {
   const tipo = document.getElementById('fin-form-tipo').value;
   document.getElementById('fin-depa-saida').style.display   = tipo === 'SAIDA'   ? 'block' : 'none';
   document.getElementById('fin-depa-entrada').style.display = tipo === 'ENTRADA' ? 'block' : 'none';
 }
+
 function submitPayment() {
   if (!finApiUrl) return;
-  const tipo = document.getElementById('fin-form-tipo').value;
-  const data = document.getElementById('fin-form-data').value;
-  const desc = document.getElementById('fin-form-desc').value.trim();
+  const tipo  = document.getElementById('fin-form-tipo').value;
+  const data  = document.getElementById('fin-form-data').value;
+  const desc  = document.getElementById('fin-form-desc').value.trim();
   const valor = document.getElementById('fin-form-valor').value;
-  const cat = document.getElementById('fin-form-cat').value;
-  const depa = tipo === 'SAIDA' ? document.getElementById('fin-form-fornecedor').value.trim() : document.getElementById('fin-form-socio').value;
-  const doc = document.getElementById('fin-form-doc').value.trim();
-  const obs = document.getElementById('fin-form-obs').value.trim();
-  if (!data || !desc || !valor) { alert('Preencha data, descrição e valor.'); return; }
+  const cat   = document.getElementById('fin-form-cat').value;
+  const depa  = tipo === 'SAIDA'
+    ? document.getElementById('fin-form-fornecedor').value.trim()
+    : document.getElementById('fin-form-socio').value;
+  const doc   = document.getElementById('fin-form-doc').value.trim();
+  const obs   = document.getElementById('fin-form-obs').value.trim();
+
+  if (!data || !desc || !valor) {
+    alert('Preencha data, descrição e valor.');
+    return;
+  }
+
   const btn = document.getElementById('fin-submit-btn');
-  btn.disabled = true; btn.textContent = 'Enviando…';
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
   const params = new URLSearchParams({ action:'add', tipo, data, desc, cat, valor, depa, doc, obs });
+
   gsFetch(finApiUrl + '?' + params.toString(), function(json) {
     if (json && json.ok) {
       finData = Array.isArray(json.data) ? json.data : finData;
-      closePaymentForm(); renderFinanceiro();
+      closePaymentForm();
+      renderFinanceiro();
       document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
-    } else { alert('Erro ao enviar. Verifique a URL do Apps Script.'); }
-    btn.disabled = false; btn.textContent = 'Registrar';
+    } else {
+      alert('Erro ao enviar. Verifique a URL do Apps Script.');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Registrar';
   });
 }
 
-// ===== ORÇAMENTO =====
-let orcCategories = [
+// ===== ORÇAMENTO DATA =====
+const orcCategories = [
   { id:'projetos', label:'📐 Projetos e Licenças', items:[
     {desc:'Projeto arquitetônico (inclui PCI)', orc:30000, cot:18000, real:null, obs:'Cotação recebida — economia R$12.000'},
     {desc:'Projeto estrutural + hidr. + elétrico', orc:7000, cot:8437.50, real:null, obs:'Cotados em conjunto. Estouro R$1.437,50'},
@@ -635,29 +808,41 @@ let orcCategories = [
     {desc:'Despesas diversas', orc:2000, cot:null, real:null, obs:''},
   ]}
 ];
+
 let orcActiveFilter = 'all';
-function orcFilter(f, btn) { orcActiveFilter=f; document.querySelectorAll('#orc-filter-row .filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderOrcTables(); }
-function buildOrcamento() { renderOrcKpis(); renderOrcTables(); window.orcBuilt=true; }
+function orcFilter(f, btn) {
+  orcActiveFilter = f;
+  document.querySelectorAll('#orc-filter-row .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrcTables();
+}
+function buildOrcamento() { renderOrcKpis(); renderOrcTables(); window.orcBuilt = true; }
 function renderOrcKpis() {
   let totOrc=0,totCot=0,totReal=0,cotCount=0,realCount=0;
-  orcCategories.forEach(cat=>cat.items.forEach(it=>{ totOrc+=it.orc; if(it.cot!=null){totCot+=it.cot;cotCount++;} if(it.real!=null){totReal+=it.real;realCount++;} }));
+  orcCategories.forEach(cat=>cat.items.forEach(it=>{
+    totOrc+=it.orc;
+    if(it.cot!=null){totCot+=it.cot;cotCount++;}
+    if(it.real!=null){totReal+=it.real;realCount++;}
+  }));
   const cotVsOrc=orcCategories.flatMap(c=>c.items.filter(i=>i.cot!=null)).reduce((s,i)=>s+(i.cot-i.orc),0);
   document.getElementById('orc-kpis').innerHTML=`
-    <div class="kpi"><div class="kpi-lbl">Total Orçado</div><div class="kpi-val">${fmt(totOrc)}</div><div class="kpi-sub">Referência base</div></div>
-    <div class="kpi ${cotVsOrc<0?'kpi-grn':'kpi-red'}"><div class="kpi-lbl">Cotações (${cotCount} itens)</div><div class="kpi-val">${fmt(totCot)}</div><div class="kpi-sub">vs orçado: ${cotVsOrc<0?'−':'+'}${fmt(Math.abs(cotVsOrc))}</div></div>
-    <div class="kpi kpi-grn"><div class="kpi-lbl">Total Pago (${realCount} itens)</div><div class="kpi-val">${fmt(totReal)}</div><div class="kpi-sub">Confirmado</div></div>
-    <div class="kpi kpi-grn"><div class="kpi-lbl">Economia líquida</div><div class="kpi-val">${fmt(Math.abs(cotVsOrc))}</div><div class="kpi-sub">Nas cotações recebidas</div></div>
+    <div class="kpi"><div class="kpi-lbl">📋 Total Orçado</div><div class="kpi-val">${fmt(totOrc)}</div><div class="kpi-sub">Referência base</div></div>
+    <div class="kpi ${cotVsOrc<0?'kpi-grn':'kpi-red'}"><div class="kpi-lbl">💬 Cotações (${cotCount} itens)</div><div class="kpi-val">${fmt(totCot)}</div><div class="kpi-sub">vs orçado: ${cotVsOrc<0?'−':'+'}${fmt(Math.abs(cotVsOrc))}</div></div>
+    <div class="kpi kpi-grn"><div class="kpi-lbl">✅ Total Pago (${realCount} itens)</div><div class="kpi-val">${fmt(totReal)}</div><div class="kpi-sub">Confirmado</div></div>
+    <div class="kpi kpi-grn"><div class="kpi-lbl">💚 Economia líquida</div><div class="kpi-val">${fmt(Math.abs(cotVsOrc))}</div><div class="kpi-sub">Nas cotações recebidas</div></div>
   `;
 }
 function renderOrcTables() {
-  const container=document.getElementById('orc-tables'); container.innerHTML='';
+  const container=document.getElementById('orc-tables');
+  container.innerHTML='';
   orcCategories.forEach(cat=>{
     if(orcActiveFilter!=='all'&&cat.id!==orcActiveFilter)return;
     const catOrc=cat.items.reduce((s,i)=>s+i.orc,0);
     const catCot=cat.items.filter(i=>i.cot!=null).reduce((s,i)=>s+i.cot,0);
     const catReal=cat.items.filter(i=>i.real!=null).reduce((s,i)=>s+i.real,0);
     const hasCot=cat.items.some(i=>i.cot!=null);
-    const sec=document.createElement('div'); sec.className='orc-section';
+    const sec=document.createElement('div');
+    sec.className='orc-section';
     let html=`<div class="orc-cat">${cat.label}<span style="font-size:11px;color:var(--mut);font-weight:400">Orçado ${fmt(catOrc)}${hasCot?' · Cotado '+fmt(catCot):''}</span></div>`;
     html+=`<div class="orc-table"><table><thead><tr><th style="min-width:220px">Item</th><th>Orçado</th><th>Cotado</th><th>Δ Cotado</th><th>Real (Pago)</th><th>Situação</th></tr></thead><tbody>`;
     cat.items.forEach(it=>{
@@ -666,4 +851,211 @@ function renderOrcTables() {
       const sitTag=it.real!=null?'<span class="tag tag-grn">Pago ✓</span>':it.cot!=null?(delta<0?'<span class="tag tag-grn">Cotado ↓</span>':'<span class="tag tag-red">Cotado ↑</span>'):'<span class="tag tag-gray">Sem cotação</span>';
       html+=`<tr class="${rowCls}"><td><div style="font-weight:500">${it.desc}</div>${it.obs?`<div class="orc-obs">${it.obs}</div>`:''}</td><td>${fmt(it.orc)}</td><td>${it.cot!=null?`<strong>${fmt(it.cot)}</strong>`:'<span class="val-empty">aguardando</span>'}</td><td>${fmtD(delta)}</td><td>${it.real!=null?`<span class="val-real">${fmt(it.real)}</span>`:'<span class="val-empty">—</span>'}</td><td>${sitTag}</td></tr>`;
     });
-    html+=`<tr class="row-total"><td>SUBTOTAL</td><td>${fmt(catOrc)}</
+    html+=`<tr class="row-total"><td>SUBTOTAL</td><td>${fmt(catOrc)}</td><td>${hasCot?fmt(catCot):'<span class="val-empty">parcial</span>'}</td><td>${hasCot?fmtD(catCot-cat.items.filter(i=>i.cot!=null).reduce((s,i)=>s+i.orc,0)):'<span class="delta-neu">—</span>'}</td><td>${catReal>0?`<span class="val-real">${fmt(catReal)}</span>`:'<span class="val-empty">—</span>'}</td><td></td></tr>`;
+    html+=`</tbody></table></div>`;
+    sec.innerHTML=html;
+    container.appendChild(sec);
+  });
+}
+
+// ===== DESEMBOLSO =====
+const phases=[
+  {label:'Pré-Protocolo',sub:'Mai/26 · URGENTE',urgente:true,proprio:54500,cef:0,items:[
+    {t:'prop',desc:'Sinal do terreno',val:10000,quando:'28/04/2026',status:'pago'},
+    {t:'prop',desc:'Projeto arquitetônico (PCI)',val:18000,quando:'Antes 12/05',status:'urgente'},
+    {t:'prop',desc:'Estrutural + Hidr. + Elét.',val:8437.50,quando:'Antes 12/05',status:'urgente'},
+    {t:'prop',desc:'ART / RRT',val:1500,quando:'Antes 12/05',status:'urgente'},
+    {t:'prop',desc:'Topografia + sondagem',val:2500,quando:'Antes 12/05',status:'urgente'},
+    {t:'prop',desc:'Avaliação técnica CEF',val:3500,quando:'Protocolo',status:'pendente'},
+  ]},
+  {label:'Protocolo / Aprovação',sub:'Jun–Jul/26',proprio:20000,cef:0,items:[
+    {t:'prop',desc:'Alvará de construção (SEMADUR)',val:3000,quando:'Após projetos',status:'pendente'},
+    {t:'prop',desc:'ITBI (2,25% × R$400k)',val:9000,quando:'Escritura',status:'pendente'},
+    {t:'prop',desc:'Taxa bancária CEF',val:3000,quando:'Aprovação',status:'pendente'},
+    {t:'prop',desc:'Escritura em cartório',val:5000,quando:'Escritura',status:'pendente'},
+  ]},
+  {label:'Escritura + Terreno',sub:'Ago/26',proprio:0,cef:390000,items:[{t:'cef',desc:'L0 — Saldo terreno (CEF → Vendedor)',val:390000,quando:'Aprovação CEF',status:'pendente'}]},
+  {label:'Fundação',sub:'M1–M3',proprio:2000,cef:84375,items:[
+    {t:'cef',desc:'L1 — Fundação 10%',val:84375,quando:'Mês 3',status:'pendente'},
+    {t:'prop',desc:'Taxas Alphaville (3 meses)',val:1054,quando:'Mensal',status:'pendente'},
+    {t:'prop',desc:'Despesas diversas',val:946,quando:'Obra',status:'pendente'},
+  ]},
+  {label:'Estrutura / Alvenaria',sub:'M4–M7',proprio:3000,cef:337500,items:[
+    {t:'cef',desc:'L2 — Estrutura 20%',val:168750,quando:'Mês 6',status:'pendente'},
+    {t:'cef',desc:'L3 — Alvenaria 20%',val:168750,quando:'Mês 8',status:'pendente'},
+    {t:'prop',desc:'Taxas + seguro + misc',val:3000,quando:'Mensal',status:'pendente'},
+  ]},
+  {label:'Cobertura / Inst.',sub:'M8–M11',proprio:3500,cef:253126,items:[
+    {t:'cef',desc:'L4 — Cobertura 15%',val:126563,quando:'Mês 10',status:'pendente'},
+    {t:'cef',desc:'L5 — Instalações 15%',val:126563,quando:'Mês 12',status:'pendente'},
+    {t:'prop',desc:'Taxas + contabilidade + misc',val:3500,quando:'Mensal',status:'pendente'},
+  ]},
+  {label:'Revestimentos',sub:'M12–M15',proprio:2500,cef:168750,items:[
+    {t:'cef',desc:'L6 — Acabamentos 20%',val:168750,quando:'Mês 15',status:'pendente'},
+    {t:'prop',desc:'Taxas + misc',val:2500,quando:'Mensal',status:'pendente'},
+  ]},
+  {label:'Acabamentos',sub:'M16–M18',proprio:2500,cef:0,items:[{t:'prop',desc:'Taxas Alphaville + marketing + misc',val:2500,quando:'Mensal',status:'pendente'}]},
+  {label:'Entrega / Cartório',sub:'Q1/2028',proprio:28873,cef:0,items:[
+    {t:'prop',desc:'Habite-se',val:2000,quando:'Conclusão',status:'pendente'},
+    {t:'prop',desc:'Averbação construção',val:5000,quando:'Habite-se',status:'pendente'},
+    {t:'prop',desc:'ISS obra',val:16875,quando:'Fim obra',status:'pendente'},
+    {t:'prop',desc:'INSS da construção',val:4000,quando:'Obra',status:'pendente'},
+    {t:'prop',desc:'Marketing / misc',val:998,quando:'Venda',status:'pendente'},
+  ]},
+];
+let currentFilter='all';
+let desembolsoChart=null;
+const fmtV=v=>'R$'+v.toLocaleString('pt-BR');
+
+function buildDesembolsoChart(){
+  if(desembolsoChart){desembolsoChart.destroy();desembolsoChart=null;}
+  const canvas=document.getElementById('chartDesembolso');
+  if(!canvas)return;
+  // força dimensões antes de criar o chart (evita 0x0 por display:none)
+  const pw=canvas.parentElement.offsetWidth;
+  if(pw>0){canvas.setAttribute('width',pw);canvas.setAttribute('height','300');}
+  const ctx=canvas.getContext('2d');
+  desembolsoChart=new Chart(ctx,{
+    data:{
+      labels:phases.map(p=>p.label),
+      datasets:[
+        {type:'bar',label:'🟠 Recursos Próprios',data:phases.map(p=>p.proprio),backgroundColor:'rgba(249,115,22,0.75)',borderColor:'rgba(249,115,22,1)',borderWidth:1,borderRadius:4,yAxisID:'y'},
+        {type:'bar',label:'🔵 Via CEF',data:phases.map(p=>p.cef),backgroundColor:'rgba(91,106,247,0.75)',borderColor:'rgba(91,106,247,1)',borderWidth:1,borderRadius:4,yAxisID:'y'},
+        {type:'line',label:'📈 Acumulado',data:(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;})();}()),borderColor:'rgba(34,197,94,0.9)',backgroundColor:'rgba(34,197,94,0.1)',borderWidth:2,pointRadius:4,fill:false,tension:0.3,yAxisID:'y2'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#8892a4',font:{size:11}}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtV(c.parsed.y)}`}}},
+      scales:{
+        x:{ticks:{color:'#8892a4',font:{size:10}},grid:{color:'rgba(45,49,72,0.5)'}},
+        y:{ticks:{color:'#8892a4',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(45,49,72,0.4)'},position:'left'},
+        y2:{ticks:{color:'rgba(34,197,94,0.8)',font:{size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'},grid:{display:false},position:'right'}
+      }
+    }
+  });
+  setTimeout(()=>{if(desembolsoChart)desembolsoChart.resize();},60);
+  buildFaseContainer(currentFilter);
+}
+
+function setFilter(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('#panel-desembolso .filter-row .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(desembolsoChart){
+    const ds=desembolsoChart.data.datasets;
+    if(f==='all'){ds[0].data=phases.map(p=>p.proprio);ds[1].data=phases.map(p=>p.cef);ds[0].hidden=false;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;})();}());}
+    else if(f==='prop'){ds[0].data=phases.map(p=>p.proprio);ds[1].hidden=true;ds[0].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio;return a;})();}());}
+    else{ds[1].data=phases.map(p=>p.cef);ds[0].hidden=true;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.cef;return a;})();}());}
+    desembolsoChart.update();
+  }
+  buildFaseContainer(f);
+}
+
+function buildFaseContainer(f){
+  const c=document.getElementById('fase-container');
+  c.innerHTML='';
+  phases.forEach((ph,pi)=>{
+    const items=f==='all'?ph.items:f==='prop'?ph.items.filter(i=>i.t==='prop'):ph.items.filter(i=>i.t==='cef');
+    if(!items.length)return;
+    const total=items.reduce((s,i)=>s+i.val,0);
+    const div=document.createElement('div');
+    div.className='phase-section';
+    div.innerHTML=`<div class="phase-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
+      <div class="phase-hdr-l"><span style="font-size:11px;background:var(--sur2);padding:2px 8px;border-radius:10px;color:var(--mut)">${pi+1}</span>${ph.label}${ph.urgente?' ⚠️':''}<span style="font-size:10px;color:var(--mut);font-weight:400">${ph.sub}</span></div>
+      <div class="phase-hdr-r">${ph.proprio>0&&(f==='all'||f==='prop')?`<span style="color:var(--org)">${fmtV(ph.proprio)} próprio</span>`:''}${ph.cef>0&&(f==='all'||f==='cef')?`<span style="color:var(--acc2)">${fmtV(ph.cef)} CEF</span>`:''}<span style="color:var(--mut)">▼</span></div>
+    </div>
+    <div class="phase-body">${items.map(it=>`<div class="detalhe-item">
+      <div class="d-dot ${it.t==='prop'?'d-prop':'d-cef'}"></div>
+      <div style="flex:1"><div class="d-desc">${it.desc}</div></div>
+      <div class="d-quando">${it.quando}</div>
+      <div style="margin-left:8px">${it.status==='pago'?'<span class="tag tag-grn">Pago ✓</span>':it.status==='urgente'?'<span class="tag tag-red">Urgente</span>':'<span class="tag tag-gray">Pendente</span>'}</div>
+      <div class="d-val" style="margin-left:10px;color:${it.t==='prop'?'var(--org)':'var(--acc2)'}">${fmtV(it.val)}</div>
+    </div>`).join('')}
+    <div style="padding:8px 14px;font-size:11px;color:var(--mut);text-align:right;border-top:1px solid rgba(45,49,72,.3)">Subtotal: <strong style="color:var(--txt)">${fmtV(total)}</strong></div>
+    </div>`;
+    c.appendChild(div);
+  });
+}
+
+// ===== CHECKLIST =====
+const checklists=[
+  {title:'FASE 1 — Aprovação Crédito CPF',color:'var(--acc2)',items:[
+    {text:'Decore (Declaração Comprobatória de Percepção de Rendimentos)',sub:'Obrigatório para sócio/autônomo na CEF',done:false},
+    {text:'IRPF — Últimas 2 declarações com recibo',sub:'',done:false},
+    {text:'Extratos bancários PF — 3 meses',sub:'',done:false},
+    {text:'Extratos bancários PJ OTR — 6 meses',sub:'',done:false},
+    {text:'RG e CPF — Gabriel e Sofia',sub:'',done:false},
+    {text:'Certidão de casamento',sub:'',done:false},
+    {text:'Comprovante de endereço — 3 meses',sub:'',done:false},
+  ]},
+  {title:'FASE 2 — Protocolo CEF ⚠️ Até 12/05',color:'var(--red)',items:[
+    {text:'Contrato de Compra e Venda assinado',sub:'Compromisso_Compra_Venda_Alphaville_IV_Q15_L03_FINAL.pdf',done:true},
+    {text:'Recibo do sinal R$10.000',sub:'Pago 28/04/2026',done:true},
+    {text:'Matrícula atualizada — Mat. 244.050',sub:'Max 30 dias · CRI Campo Grande',done:false},
+    {text:'CND do vendedor (INSS, RF, Estadual, Municipal)',sub:'',done:false},
+    {text:'Declaração de ônus reais — cartório',sub:'',done:false},
+    {text:'PCI — Proposta de Construção Individual',sub:'Elaborada pelo arquiteto',done:false},
+    {text:'Projeto arquitetônico',sub:'',done:false},
+    {text:'Formulários de cadastro CEF',sub:'',done:false},
+  ]},
+  {title:'FASE 3 — Aprovação Financiamento (até 27/07)',color:'var(--ylw)',items:[
+    {text:'Laudo de avaliação CEF (R$2.000.000)',sub:'',done:false},
+    {text:'Projeto estrutural com ART CREA',sub:'',done:false},
+    {text:'Projetos hidr. e elétrico com ART/RRT',sub:'',done:false},
+    {text:'Memorial descritivo da obra',sub:'',done:false},
+    {text:'Orçamento analítico da obra',sub:'',done:false},
+    {text:'Cronograma físico-financeiro 18 meses',sub:'',done:false},
+    {text:'ART de execução da obra',sub:'',done:false},
+  ]},
+  {title:'FASE 4 — Início Obra e Medições',color:'var(--org)',items:[
+    {text:'Alvará de construção — SEMADUR',sub:'',done:false},
+    {text:'Aprovação Associação Alphaville CG4',sub:'',done:false},
+    {text:'Contrato empreiteiro / OTR Engenharia',sub:'',done:false},
+    {text:'Seguro de obra contratado',sub:'',done:false},
+    {text:'Liberações L1 a L6 (medições CEF)',sub:'6 etapas ao longo dos 18 meses',done:false},
+  ]},
+  {title:'FASE 5 — Entrega e Encerramento',color:'var(--grn)',items:[
+    {text:'Habite-se',sub:'',done:false},
+    {text:'ART de conclusão',sub:'',done:false},
+    {text:'Averbação construção — Mat. 244.050',sub:'',done:false},
+    {text:'Recolhimento INSS da construção',sub:'',done:false},
+    {text:'Escritura definitiva de compra e venda',sub:'',done:false},
+  ]},
+];
+const cstate={};
+const ccontainer=document.getElementById('checklist-container');
+let totalCk=0;
+checklists.forEach((gr,gi)=>{
+  const grp=document.createElement('div');grp.className='cbox';
+  const hdr=document.createElement('div');hdr.className='cbox-hdr';
+  hdr.innerHTML=`<div class="cbox-hdr-l"><span style="width:10px;height:10px;border-radius:50%;background:${gr.color};display:inline-block"></span>${gr.title}</div><span id="gc${gi}" style="font-size:11px;color:var(--mut)"></span>`;
+  hdr.onclick=()=>{const b=grp.querySelector('.cbox-body');b.style.display=b.style.display==='none'?'':'none';};
+  const body=document.createElement('div');body.className='cbox-body';
+  gr.items.forEach((it,ii)=>{
+    totalCk++;
+    const key=`${gi}-${ii}`;
+    const isDone=cstate[key]!==undefined?cstate[key]:it.done;
+    const el=document.createElement('div');el.className='citem';
+    el.innerHTML=`<div class="cb ${isDone?'checked':''}" id="cb${gi}${ii}"></div><div><div class="ctext" style="${isDone?'text-decoration:line-through;opacity:.55':''}" id="ct${gi}${ii}">${it.text}</div>${it.sub?`<div class="csub">${it.sub}</div>`:''}</div>`;
+    el.onclick=()=>{
+      const cb=document.getElementById(`cb${gi}${ii}`);
+      const ct=document.getElementById(`ct${gi}${ii}`);
+      const was=cb.classList.contains('checked');
+      cb.classList.toggle('checked');
+      ct.style.textDecoration=was?'':'line-through';
+      ct.style.opacity=was?'':'.55';
+      cstate[key]=!was;
+      updateCkProgress();updateGc(gi);
+    };
+    body.appendChild(el);
+  });
+  grp.appendChild(hdr);grp.appendChild(body);ccontainer.appendChild(grp);
+});
+function updateGc(gi){let d=0;checklists[gi].items.forEach((_,ii)=>{if(document.getElementById(`cb${gi}${ii}`)?.classList.contains('checked'))d++;});const el=document.getElementById(`gc${gi}`);if(el)el.textContent=`${d}/${checklists[gi].items.length}`;}
+function updateCkProgress(){let c=0;document.querySelectorAll('.cb.checked').forEach(()=>c++);const pct=Math.round(c/totalCk*100);document.getElementById('check-progress').textContent=`${c} / ${totalCk} itens (${pct}%)`;document.getElementById('check-bar').style.width=pct+'%';}
+checklists.forEach((_,gi)=>updateGc(gi));
+updateCkProgress();
+</script>
+</body>
+</html>
