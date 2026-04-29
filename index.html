@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<script type="application/json" id="cowork-artifact-meta">
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
 {
   "name": "Alphaville Otr",
   "schemaVersion": 1,
@@ -78,7 +77,6 @@ tr:last-child td{border-bottom:none}
 .filter-btn.f-prop.active{background:rgba(249,115,22,.15);border-color:var(--org);color:var(--org)}
 .filter-btn.f-cef.active{background:rgba(91,106,247,.15);border-color:var(--acc2);color:var(--acc2)}
 .chart-wrap{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:14px}
-canvas{max-height:300px}
 .detalhe-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid rgba(45,49,72,.4)}
 .detalhe-item:last-child{border-bottom:none}
 .d-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -249,7 +247,7 @@ canvas{max-height:300px}
   </div>
   <div class="chart-wrap">
     <div style="font-size:11px;color:var(--mut);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Desembolso por Fase — Próprio vs CEF (R$)</div>
-    <canvas id="chartDesembolso"></canvas>
+    <div style="position:relative;height:300px"><canvas id="chartDesembolso"></canvas></div>
   </div>
   <div class="sec">
     <div class="sec-ttl">Detalhamento por Fase</div>
@@ -396,7 +394,7 @@ function setTab(name, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
-  if (name === 'desembolso' && !window.chartBuilt) buildDesembolsoChart();
+  if (name === 'desembolso' && !window.chartBuilt) { window.chartBuilt = true; setTimeout(buildDesembolsoChart, 80); }
   if (name === 'orcamento' && !window.orcBuilt) buildOrcamento();
 }
 
@@ -531,7 +529,6 @@ function renderOrcTables() {
         <td>${sitTag}</td>
       </tr>`;
     });
-    // Total row
     html += `<tr class="row-total">
       <td>SUBTOTAL</td>
       <td>${fmt(catOrc)}</td>
@@ -626,7 +623,7 @@ function buildDesembolsoChart() {
       ]
     },
     options: {
-      responsive:true, interaction:{mode:'index',intersect:false},
+      responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
       plugins:{ legend:{labels:{color:'#8892a4',font:{size:11}}}, tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtV(c.parsed.y)}`}} },
       scales:{
         x:{ticks:{color:'#8892a4',font:{size:10}},grid:{color:'rgba(45,49,72,0.5)'}},
