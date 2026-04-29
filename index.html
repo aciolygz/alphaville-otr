@@ -198,7 +198,7 @@ tr:last-child td{border-bottom:none}
 <!-- FINANCEIRO -->
 <div class="panel" id="panel-financeiro">
 
-  <!-- SETUP: mostrado quando URL não está configurada -->
+  <!-- SETUP -->
   <div id="fin-setup" style="display:none">
     <div class="alert alert-blu">
       <div class="alert-icon">⚙️</div>
@@ -588,18 +588,39 @@ function reloadFin() {
   loadFinData();
 }
 
+// JSONP helper — bypassa CORS do Apps Script
+function gsFetch(url, cb) {
+  var name = '_gs_' + Date.now();
+  var s    = document.createElement('script');
+  var done = false;
+  window[name] = function(data) {
+    done = true;
+    delete window[name];
+    if (s.parentNode) s.parentNode.removeChild(s);
+    cb(data);
+  };
+  s.onerror = function() {
+    if (done) return;
+    done = true;
+    delete window[name];
+    if (s.parentNode) s.parentNode.removeChild(s);
+    cb(null);
+  };
+  s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + name;
+  document.body.appendChild(s);
+}
+
 function loadFinData() {
   document.getElementById('fin-status').textContent = 'Carregando dados…';
-  fetch(finApiUrl + '?action=read')
-    .then(r => r.json())
-    .then(json => {
-      finData = Array.isArray(json.data) ? json.data : [];
-      document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
-      renderFinanceiro();
-    })
-    .catch(e => {
-      document.getElementById('fin-status').textContent = 'Erro ao carregar: ' + e.message;
-    });
+  gsFetch(finApiUrl + '?action=read', function(json) {
+    if (!json) {
+      document.getElementById('fin-status').textContent = 'Erro ao carregar. Verifique a URL.';
+      return;
+    }
+    finData = Array.isArray(json.data) ? json.data : [];
+    document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
+    renderFinanceiro();
+  });
 }
 
 function renderFinanceiro() {
@@ -608,9 +629,8 @@ function renderFinanceiro() {
   const totSaida = saidas.reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
   const totEntr  = entradas.reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
   const quota    = totSaida * SHARE;
-  const pendente = totSaida * (1 - SHARE) - totEntr; // what Gabriel is still owed from sócios
+  const pendente = totSaida * (1 - SHARE) - totEntr;
 
-  // KPIs
   document.getElementById('fin-kpis').innerHTML = `
     <div class="kpi kpi-red"><div class="kpi-lbl">💸 Total Pago (Gabriel)</div><div class="kpi-val">${fmt(totSaida)}</div><div class="kpi-sub">Todas as saídas realizadas</div></div>
     <div class="kpi kpi-grn"><div class="kpi-lbl">💚 Recebido dos Sócios</div><div class="kpi-val">${fmt(totEntr)}</div><div class="kpi-sub">Aportes recebidos</div></div>
@@ -618,10 +638,7 @@ function renderFinanceiro() {
     <div class="kpi kpi-blu"><div class="kpi-lbl">📐 Quota por Sócio</div><div class="kpi-val">${fmt(quota)}</div><div class="kpi-sub">33,33% do total pago</div></div>
   `;
 
-  // Sócio cards
   const cards = [];
-
-  // Gabriel card (always first)
   const gabrielAdiantado = totSaida - quota - totEntr;
   cards.push(`
     <div class="socio-card me">
@@ -745,23 +762,18 @@ function submitPayment() {
 
   const params = new URLSearchParams({ action:'add', tipo, data, desc, cat, valor, depa, doc, obs });
 
-  fetch(finApiUrl + '?' + params.toString())
-    .then(r => r.json())
-    .then(json => {
-      if (json.ok) {
-        finData = Array.isArray(json.data) ? json.data : finData;
-        closePaymentForm();
-        renderFinanceiro();
-        document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
-      }
-      btn.disabled = false;
-      btn.textContent = 'Registrar';
-    })
-    .catch(e => {
-      alert('Erro ao enviar: ' + e.message);
-      btn.disabled = false;
-      btn.textContent = 'Registrar';
-    });
+  gsFetch(finApiUrl + '?' + params.toString(), function(json) {
+    if (json && json.ok) {
+      finData = Array.isArray(json.data) ? json.data : finData;
+      closePaymentForm();
+      renderFinanceiro();
+      document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
+    } else {
+      alert('Erro ao enviar. Verifique a URL do Apps Script.');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Registrar';
+  });
 }
 
 // ===== ORÇAMENTO DATA =====
@@ -813,7 +825,6 @@ function renderOrcKpis() {
     if(it.real!=null){totReal+=it.real;realCount++;}
   }));
   const cotVsOrc=orcCategories.flatMap(c=>c.items.filter(i=>i.cot!=null)).reduce((s,i)=>s+(i.cot-i.orc),0);
-  const orcOfCotted=orcCategories.flatMap(c=>c.items.filter(i=>i.cot!=null)).reduce((s,i)=>s+i.orc,0);
   document.getElementById('orc-kpis').innerHTML=`
     <div class="kpi"><div class="kpi-lbl">📋 Total Orçado</div><div class="kpi-val">${fmt(totOrc)}</div><div class="kpi-sub">Referência base</div></div>
     <div class="kpi ${cotVsOrc<0?'kpi-grn':'kpi-red'}"><div class="kpi-lbl">💬 Cotações (${cotCount} itens)</div><div class="kpi-val">${fmt(totCot)}</div><div class="kpi-sub">vs orçado: ${cotVsOrc<0?'−':'+'}${fmt(Math.abs(cotVsOrc))}</div></div>
