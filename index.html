@@ -39,6 +39,7 @@ body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans
 .sec{margin-bottom:16px}.sec-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mut);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}.phase-hdr,.detalhe-item{align-items:flex-start;flex-wrap:wrap}.phase-hdr-r{flex-wrap:wrap}.d-quando{margin-left:0}}
 @media(max-width:700px){.grid3{grid-template-columns:1fr}}
 @media(max-width:600px){.grid2{grid-template-columns:1fr}}
 .tbl-wrap{overflow-x:auto}
@@ -68,7 +69,7 @@ tr:last-child td{border-bottom:none}
 .vrow:last-child{border-bottom:none}
 .vrow.total{font-weight:700;color:#fff;padding-top:10px;margin-top:4px;border-top:1px solid var(--bd);border-bottom:none;font-size:13px}
 .vrow.lucro{color:var(--grn);font-weight:700}
-.card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:14px}
+.card{background:var(--sur);border:1px solid var(--bd);border-radius:var(--r);padding:14px;overflow-wrap:anywhere}
 .prog-bar{background:var(--sur2);border-radius:4px;height:6px;margin-top:6px;overflow:hidden}
 .prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
 .note{background:var(--sur);border:1px solid var(--bd);border-left:3px solid var(--acc);border-radius:var(--r);padding:10px 14px;font-size:12px;line-height:1.6;margin-bottom:8px}
@@ -152,6 +153,10 @@ tr:last-child td{border-bottom:none}
   <div class="tab" onclick="setTab('financeiro',this)">💰 Financeiro</div>
   <div class="tab" onclick="setTab('contrato',this)">Contrato & Prazos</div>
   <div class="tab" onclick="setTab('desembolso',this)">Desembolso</div>
+  <div class="tab" onclick="setTab('medicoes',this)">🏦 Medições CEF</div>
+  <div class="tab" onclick="setTab('documentos',this)">Documentos</div>
+  <div class="tab" onclick="setTab('socios',this)">&#128101; S&oacute;cios &amp; Aportes</div>
+  <div class="tab" onclick="setTab('riscos',this)">&#9888;&#65039; Riscos &amp; A&ccedil;&otilde;es</div>
   <div class="tab" onclick="setTab('orcamento',this)">Orçamento vs Real</div>
   <div class="tab" onclick="setTab('checklist',this)">Checklist</div>
   <div class="tab" onclick="setTab('viabilidade',this)">Viabilidade</div>
@@ -162,39 +167,41 @@ tr:last-child td{border-bottom:none}
 
 <!-- VISÃO GERAL -->
 <div class="panel active" id="panel-visao">
-  <div class="alert alert-red">
-    <div class="alert-icon">🚨</div>
-    <div>
-      <div class="alert-title">AÇÃO URGENTE — Protocolar CEF até 12/05/2026</div>
-      <div class="alert-body">Contrato assinado 28/04/2026. Prazo: 10 dias úteis. Sinal R$10.000 pago. Aprovação de crédito CPF já solicitada. Não protocolar = risco de perda do sinal (cláusula 3.3).</div>
+  <div id="cockpit-main-alert"></div>
+  <div class="sec">
+    <div class="sec-ttl">Proxima Acao Critica</div>
+    <div id="cockpit-critical-action"></div>
+  </div>
+  <div class="kpi-grid" id="cockpit-kpis"></div>
+  <div class="grid2">
+    <div class="sec">
+      <div class="sec-ttl">CEF / Medicoes</div>
+      <div id="cockpit-cef"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-ttl">Documentos Criticos</div>
+      <div id="cockpit-docs"></div>
     </div>
   </div>
-  <div class="kpi-grid">
-    <div class="kpi"><div class="kpi-lbl">Terreno</div><div class="kpi-val">375m²</div><div class="kpi-sub">Q15 L03 · R$400k</div></div>
-    <div class="kpi"><div class="kpi-lbl">Área Construída</div><div class="kpi-val">187,5m²</div><div class="kpi-sub">Padrão alto · 3Q 2B 2G</div></div>
-    <div class="kpi kpi-blu"><div class="kpi-lbl">VGV</div><div class="kpi-val">R$2,0M</div><div class="kpi-sub">R$10.667/m²</div></div>
-    <div class="kpi kpi-grn"><div class="kpi-lbl">Margem Bruta</div><div class="kpi-val">24,1%</div><div class="kpi-sub">ROI: 31,7%</div></div>
-    <div class="kpi kpi-grn"><div class="kpi-lbl">Lucro Bruto</div><div class="kpi-val">R$481k</div><div class="kpi-sub">Cenário base</div></div>
-    <div class="kpi kpi-ylw"><div class="kpi-lbl">Prazo Obra</div><div class="kpi-val">18 meses</div><div class="kpi-sub">Após aprovação CEF</div></div>
-    <div class="kpi kpi-blu"><div class="kpi-lbl">Financiamento CEF</div><div class="kpi-val">R$1,6M</div><div class="kpi-sub">80% · 30 anos · SBPE</div></div>
-    <div class="kpi kpi-grn"><div class="kpi-lbl">Economia Projetos</div><div class="kpi-val">R$10.563</div><div class="kpi-sub">Cotações recebidas</div></div>
+  <div class="grid2">
+    <div class="sec">
+      <div class="sec-ttl">Riscos Principais</div>
+      <div id="cockpit-risks"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-ttl">Socios & Aportes</div>
+      <div id="cockpit-socios"></div>
+    </div>
   </div>
   <div class="sec">
     <div class="sec-ttl">Rastreador de Fases</div>
-    <div class="fase-tracker">
-      <div class="fase done"><div style="font-size:16px">✅</div><div><div class="fase-name">Contrato de Compra e Venda Assinado</div><div class="fase-desc">Sinal R$10.000 pago · Roberto Torres Neto</div></div><div class="fase-date">28/04/2026</div></div>
-      <div class="fase done"><div style="font-size:16px">✅</div><div><div class="fase-name">Aprovação de Crédito CPF Solicitada</div><div class="fase-desc">CPF Gabriel Acioly · Aguardando retorno CEF</div></div><div class="fase-date">Em andamento</div></div>
-      <div class="fase active"><div style="font-size:16px">⏳</div><div><div class="fase-name">Protocolo do Financiamento na CEF</div><div class="fase-desc">10 dias úteis · Documentação PF completa + projetos</div></div><div class="fase-date" style="color:var(--red)">⚠️ 12/05/2026</div></div>
-      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Laudo de Avaliação CEF</div><div class="fase-desc">Vistoria técnica · Imóvel avaliado R$2.000.000</div></div><div class="fase-date">Após protocolo</div></div>
-      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Aprovação + Escritura + Liberação Terreno</div><div class="fase-desc">Prazo contratual 90 dias · CEF libera R$390.000 para vendedor</div></div><div class="fase-date">Até 27/07/2026</div></div>
-      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Início da Obra + PCI Aprovada</div><div class="fase-desc">Alvará + aprovação Alphaville CG4 + contrato empreiteiro</div></div><div class="fase-date">Q3 2026</div></div>
-      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Medições e Liberações CEF — 6 etapas</div><div class="fase-desc">R$843.750 liberados conforme % físico da obra</div></div><div class="fase-date">18 meses</div></div>
-      <div class="fase pending"><div style="font-size:16px">⬜</div><div><div class="fase-name">Habite-se + Averbação + Entrega</div><div class="fase-desc">Registro cartório · Liberação final CEF</div></div><div class="fase-date">Q1 2028</div></div>
-    </div>
+    <div class="fase-tracker" id="cockpit-fases"></div>
   </div>
-  <div class="note">💡 <strong>Condição suspensiva:</strong> O CCV é condicional à aprovação do financiamento CEF em até 90 dias. Se negado, sinal devolvido. Prioridade máxima: protocolar antes de 12/05/2026.</div>
+  <div class="sec">
+    <div class="sec-ttl">O que fazer agora</div>
+    <div id="cockpit-recommendations"></div>
+  </div>
 </div>
-
 <!-- FINANCEIRO -->
 <div class="panel" id="panel-financeiro">
 
@@ -423,7 +430,114 @@ tr:last-child td{border-bottom:none}
   <div class="note">⚠️ Juros de obra (~R$127.849 total durante 18 meses) estão dentro do buffer de R$366.250 — incorporados ao saldo devedor, não impactam o caixa diretamente.</div>
 </div>
 
+<!-- MEDIÇÕES CEF -->
+<div class="panel" id="panel-medicoes">
+  <div class="alert alert-blu">
+    <div class="alert-icon">🏦</div>
+    <div>
+      <div class="alert-title">Medições CEF — Liberações por Etapa Física</div>
+      <div class="alert-body">Tela de controle das liberações CEF por etapa física. Use esta aba para acompanhar valores previstos, solicitados, liberados e pendências de cada medição.</div>
+    </div>
+  </div>
+  <div class="kpi-grid" id="med-kpis"></div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--mut);letter-spacing:.5px">Progresso financeiro liberado</div>
+      <div id="med-progress-label" style="font-size:13px;font-weight:700;color:var(--acc2)">0%</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="med-progress-bar" style="width:0%"></div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl">Tabela de Medições</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Medição</th><th>Gatilho físico</th><th>% Obra</th><th>Valor previsto</th><th>Solicitado</th><th>Liberado</th><th>Saldo</th><th>Status</th><th>Pendência</th><th>Responsável</th><th>Documento</th>
+        </tr></thead>
+        <tbody id="med-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl">Resumo por Medição</div>
+    <div class="grid3" id="med-cards"></div>
+  </div>
+</div>
+
+<!-- DOCUMENTOS -->
+<div class="panel" id="panel-documentos">
+  <div class="alert alert-ylw">
+    <div class="alert-icon">DOC</div>
+    <div>
+      <div class="alert-title">Documentos do Projeto - Controle Somente Leitura</div>
+      <div class="alert-body">Acompanhe documentos exigidos por CEF, Prefeitura, Condominio e contrato. O cadastro e a atualizacao continuam concentrados na aba Documentos do Google Sheets.</div>
+    </div>
+  </div>
+  <div class="kpi-grid" id="doc-kpis"></div>
+  <div class="sec">
+    <div class="sec-ttl">Documentos Cadastrados</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Documento</th><th>Categoria</th><th>Exigido por</th><th>Responsavel</th><th>Status</th><th>Prioridade</th><th>Prazo</th><th>Recebido</th><th>Arquivo</th><th>Obs</th>
+        </tr></thead>
+        <tbody id="doc-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl">Resumo por Documento</div>
+    <div class="grid3" id="doc-cards"></div>
+  </div>
+</div>
+
 <!-- ORÇAMENTO VS REAL -->
+
+<!-- SOCIOS & APORTES -->
+<div class="panel" id="panel-socios">
+  <div class="alert alert-blu">
+    <div class="alert-icon">SOC</div>
+    <div>
+      <div class="alert-title">Socios & Aportes - Controle Somente Leitura</div>
+      <div class="alert-body">Controle de participacao e aportes entre socios. Nesta fase, a tela e somente leitura e considera os registros da aba Aportes; se ela estiver vazia, usa entradas legadas registradas no Financeiro.</div>
+    </div>
+  </div>
+  <div class="kpi-grid" id="soc-kpis"></div>
+  <div class="sec">
+    <div class="sec-ttl">Conta Corrente Proporcional</div>
+    <div class="grid3" id="soc-cards"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-ttl">Aportes Registrados</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Data</th><th>Socio</th><th>Tipo</th><th>Valor</th><th>Descricao</th><th>Status</th><th>Documento</th><th>Origem</th>
+        </tr></thead>
+        <tbody id="soc-aportes-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="note">Pagamentos diretos a fornecedores ainda nao sao automaticamente tratados como aporte nesta tela. Para conta corrente societaria completa, a proxima fase deve classificar pagamentos por pagador ou registrar lancamentos na aba Aportes.</div>
+</div>
+
+<!-- RISCOS & ACOES -->
+<div class="panel" id="panel-riscos">
+  <div class="alert alert-ylw">
+    <div class="alert-icon">!</div>
+    <div>
+      <div class="alert-title">Riscos & Acoes - Controle Somente Leitura</div>
+      <div class="alert-body">Painel de riscos e proximas acoes do projeto. Use esta aba para acompanhar ameacas relevantes, prazos criticos, responsaveis e acoes necessarias.</div>
+    </div>
+  </div>
+  <div class="kpi-grid" id="risk-kpis"></div>
+  <div class="sec"><div class="sec-ttl">Proxima Acao Critica</div><div id="risk-critical-action"></div></div>
+  <div class="sec"><div class="sec-ttl">Tabela de Riscos</div><div class="tbl-wrap"><table><thead><tr><th>Categoria</th><th>Risco</th><th>Probabilidade</th><th>Impacto</th><th>Severidade</th><th>Impacto R$</th><th>Prazo</th><th>Status</th><th>Responsavel</th><th>Plano de acao</th></tr></thead><tbody id="risk-table-body"></tbody></table></div></div>
+  <div class="sec"><div class="sec-ttl">Riscos - Cards</div><div class="grid3" id="risk-cards"></div></div>
+  <div class="sec"><div class="sec-ttl">Tabela de Proximas Acoes</div><div class="tbl-wrap"><table><thead><tr><th>Prioridade</th><th>Acao</th><th>Categoria</th><th>Responsavel</th><th>Prazo</th><th>Status</th><th>Origem</th><th>Referencia</th></tr></thead><tbody id="action-table-body"></tbody></table></div></div>
+  <div class="sec"><div class="sec-ttl">Acoes - Cards</div><div class="grid3" id="action-cards"></div></div>
+</div>
+<!-- ORCAMENTO VS REAL -->
 <div class="panel" id="panel-orcamento">
   <div class="alert alert-grn">
     <div class="alert-icon">📊</div>
@@ -535,17 +649,65 @@ function setTab(name, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'visao') renderCockpit();
   if (name === 'desembolso') { clearTimeout(window._chartT); window._chartT = setTimeout(buildDesembolsoChart, 150); }
+  if (name === 'medicoes') renderMedicoesCef();
+  if (name === 'documentos') renderDocumentos();
+  if (name === 'socios') renderSociosAportes();
+  if (name === 'riscos') renderRiscosAcoes();
   if (name === 'orcamento'  && !window.orcBuilt)   buildOrcamento();
   if (name === 'financeiro' && !window.finInit)    { window.finInit = true; initFinanceiro(); }
 }
 
 const fmt  = v => v == null ? '—' : 'R$' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:2});
-const fmtD = v => {
-  if (v == null) return '<span class="delta-neu">—</span>';
-  const s = v < 0 ? '<span class="delta-grn">▼ ' : v > 0 ? '<span class="delta-red">▲ +' : '<span class="delta-neu">';
-  return s + fmt(Math.abs(v)) + ' (' + Math.abs(Math.round(v / Math.abs(v || 1) * 100)) + '%)' + '</span>';
+const fmtD = (delta, base) => {
+  if (delta == null) return '<span class="delta-neu">—</span>';
+  const s = delta < 0 ? '<span class="delta-grn">▼ ' : delta > 0 ? '<span class="delta-red">▲ +' : '<span class="delta-neu">';
+  const pct = base ? Math.abs(delta / base * 100) : null;
+  return s + fmt(Math.abs(delta)) + (pct == null ? '' : ' (' + pct.toFixed(1).replace('.', ',') + '%)') + '</span>';
 };
+const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const safeCssColor = v => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(v || '')) || /^var\(--[a-z0-9-]+\)$/i.test(String(v || '')) ? String(v) : 'var(--mut)';
+function safeUrl(rawUrl) {
+  const raw = String(rawUrl || '').trim();
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : null;
+  } catch (_) {
+    return null;
+  }
+}
+function safeDocCell(docRef) {
+  const raw = String(docRef || '').trim();
+  if (!raw) return '<span style="color:var(--mut)">—</span>';
+  const url = safeUrl(raw);
+  if (url) return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:var(--acc2);text-decoration:none">🔗 Ver</a>`;
+  return `<span style="color:var(--mut);font-size:10px">${escapeHtml(raw)}</span>`;
+}
+
+function emptyDashboardData() {
+  return {
+    schema_version: null,
+    pagamentos: [],
+    orcamento: [],
+    checklist: [],
+    desembolso: [],
+    projeto: [],
+    socios: [],
+    medicoes_cef: [],
+    documentos: [],
+    aportes: [],
+    riscos: [],
+    proximas_acoes: [],
+    fases: [],
+    log_alteracoes: [],
+    loaded: false,
+    source: null,
+    error: null
+  };
+}
+window.dashboardData = emptyDashboardData();
 
 // ===== FINANCEIRO =====
 const FIN_URL_KEY  = 'otr_alphaville_api_url';
@@ -555,6 +717,32 @@ const SHARE        = 1 / 3;
 let finData        = [];
 let finFilter      = 'all';
 let finApiUrl      = '';
+let allDataLoaded  = false;
+let allDataLoading = false;
+
+function setFinStatus(msg) {
+  const el = document.getElementById('fin-status');
+  if (el) el.textContent = msg;
+}
+
+function errorMessage(json, fallback) {
+  if (!finApiUrl) return 'URL do Apps Script não configurada.';
+  if (!json) return 'Erro de resposta. Verifique conexão e URL.';
+  if (json.error_code === 'UNSUPPORTED_ACTION') return 'Action não suportada pelo Apps Script publicado.';
+  if (json.error_code === 'INVALID_CALLBACK') return 'Resposta inválida do Apps Script.';
+  if (json.error_code === 'REQUEST_TIMEOUT') return 'Tempo de resposta esgotado. Tente atualizar novamente.';
+  if (json.error_code === 'REQUEST_FAILED') return 'Falha ao carregar. Verifique se a URL está publicada como Web App.';
+  if (json.error_code === 'INVALID_RESPONSE') return 'Resposta inválida do Apps Script.';
+  return fallback || 'Erro ao carregar dados.';
+}
+
+function sourceLabel(source) {
+  if (source === 'read_dashboard') return 'read_dashboard v3';
+  if (source === 'read_all') return 'read_all legacy';
+  if (source === 'local_fallback') return 'fallback local';
+  if (source === 'error') return 'erro';
+  return 'dados';
+}
 
 function initFinanceiro() {
   finApiUrl = localStorage.getItem(FIN_URL_KEY) || '';
@@ -564,7 +752,12 @@ function initFinanceiro() {
   } else {
     document.getElementById('fin-setup').style.display   = 'none';
     document.getElementById('fin-content').style.display = 'block';
-    loadAllData();
+    if (allDataLoaded) {
+      setFinStatus('Atualizado agora · ' + finData.length + ' registros · ' + sourceLabel(window.dashboardData && window.dashboardData.source));
+      renderFinanceiro();
+    } else if (!allDataLoading) {
+      loadAllData();
+    }
   }
 }
 
@@ -573,6 +766,8 @@ function saveFinUrl() {
   if (!url) return;
   localStorage.setItem(FIN_URL_KEY, url);
   finApiUrl = url;
+  allDataLoaded = false;
+  allDataLoading = false;
   window.finInit = false;
   initFinanceiro();
 }
@@ -580,19 +775,37 @@ function saveFinUrl() {
 function resetFinConfig() {
   localStorage.removeItem(FIN_URL_KEY);
   finApiUrl = '';
+  allDataLoaded = false;
+  allDataLoading = false;
+  window.dashboardData = emptyDashboardData();
   document.getElementById('fin-setup').style.display   = 'block';
   document.getElementById('fin-content').style.display = 'none';
 }
 
-function reloadFin() { loadAllData(); }
+function reloadFin() {
+  finApiUrl = localStorage.getItem(FIN_URL_KEY) || finApiUrl;
+  if (!finApiUrl) {
+    setFinStatus(errorMessage(null));
+    return;
+  }
+  loadAllData();
+}
 
 // JSONP helper — bypassa CORS do Apps Script
 function gsFetch(url, cb) {
-  var name = '_gs_' + Date.now();
+  var name = '_otr_gs_' + Date.now() + '_' + Math.random().toString(36).slice(2);
   var s    = document.createElement('script');
   var done = false;
+  var timer = setTimeout(function() {
+    if (done) return;
+    done = true;
+    delete window[name];
+    if (s.parentNode) s.parentNode.removeChild(s);
+    cb({ok:false,error_code:'REQUEST_TIMEOUT'});
+  }, 15000);
   window[name] = function(data) {
     done = true;
+    clearTimeout(timer);
     delete window[name];
     if (s.parentNode) s.parentNode.removeChild(s);
     cb(data);
@@ -600,23 +813,24 @@ function gsFetch(url, cb) {
   s.onerror = function() {
     if (done) return;
     done = true;
+    clearTimeout(timer);
     delete window[name];
     if (s.parentNode) s.parentNode.removeChild(s);
-    cb(null);
+    cb({ok:false,error_code:'REQUEST_FAILED'});
   };
   s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + name;
   document.body.appendChild(s);
 }
 
 function loadFinData() {
-  document.getElementById('fin-status').textContent = 'Carregando dados…';
+  setFinStatus('Carregando dados…');
   gsFetch(finApiUrl + '?action=read', function(json) {
-    if (!json) {
-      document.getElementById('fin-status').textContent = 'Erro ao carregar. Verifique a URL.';
+    if (!json || !json.ok || !Array.isArray(json.data)) {
+      setFinStatus(errorMessage(json, 'Resposta inválida do Apps Script.'));
       return;
     }
-    finData = Array.isArray(json.data) ? json.data : [];
-    document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
+    finData = json.data;
+    setFinStatus('Atualizado agora · ' + finData.length + ' registros');
     renderFinanceiro();
   });
 }
@@ -630,9 +844,12 @@ function parseOrcamento(rows) {
   rows.forEach(row => {
     const id = row.cat_id;
     if (!cats[id]) { cats[id] = {id, label: row.cat_label, items: []}; catOrder.push(id); }
-    cats[id].items.push({ desc: row.desc||'', orc: toNum(row.orc)||0, cot: toNum(row.cot), real: toNum(row.real), obs: row.obs||'' });
+    cats[id].items.push({ idx: parseInt(row.item_idx), desc: row.desc||'', orc: toNum(row.orc)||0, cot: toNum(row.cot), real: toNum(row.real), obs: row.obs||'' });
   });
-  return catOrder.map(id => cats[id]);
+  return catOrder.map(id => {
+    cats[id].items.sort((a,b) => (Number.isFinite(a.idx) ? a.idx : 9999) - (Number.isFinite(b.idx) ? b.idx : 9999));
+    return cats[id];
+  });
 }
 
 function parseDesembolso(rows) {
@@ -643,9 +860,12 @@ function parseDesembolso(rows) {
     const val = parseFloat(row.val) || 0;
     if (row.tipo === 'prop') phs[fi].proprio += val;
     else if (row.tipo === 'cef') phs[fi].cef += val;
-    phs[fi].items.push({t:row.tipo, desc:row.desc, val, quando:row.quando, status:row.status||'pendente'});
+    phs[fi].items.push({li:parseInt(row.li), t:row.tipo, desc:row.desc, val, quando:row.quando, status:row.status||'pendente'});
   });
-  return phOrder.sort((a,b) => a - b).map(fi => phs[fi]);
+  return phOrder.sort((a,b) => a - b).map(fi => {
+    phs[fi].items.sort((a,b) => (Number.isFinite(a.li) ? a.li : 9999) - (Number.isFinite(b.li) ? b.li : 9999));
+    return phs[fi];
+  });
 }
 
 function parseChecklist(rows) {
@@ -653,39 +873,832 @@ function parseChecklist(rows) {
   rows.forEach(row => {
     const gi = parseInt(row.gi);
     if (!groups[gi]) { groups[gi] = {title:row.titulo, color:row.cor, items:[]}; grOrder.push(gi); }
-    groups[gi].items.push({text:row.texto, sub:row.sub||'', done:toBool(row.done)});
+    groups[gi].items.push({gi, ii:parseInt(row.ii), text:row.texto, sub:row.sub||'', done:toBool(row.done)});
   });
-  return grOrder.sort((a,b) => a - b).map(gi => groups[gi]);
+  return grOrder.sort((a,b) => a - b).map(gi => {
+    groups[gi].items.sort((a,b) => (Number.isFinite(a.ii) ? a.ii : 9999) - (Number.isFinite(b.ii) ? b.ii : 9999));
+    return groups[gi];
+  });
 }
 
-function loadAllData() {
-  document.getElementById('fin-status').textContent = 'Carregando dados…';
-  gsFetch(finApiUrl + '?action=read_all', function(json) {
-    if (!json || !json.ok) {
-      document.getElementById('fin-status').textContent = 'Erro ao carregar. Verifique a URL.';
+function normalizeArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function normalizeDashboardPayload(json) {
+  const data = emptyDashboardData();
+  try {
+    const src = json && json.__source ? json.__source : null;
+    data.schema_version = json && json.schema_version ? String(json.schema_version) : null;
+    data.pagamentos = normalizeArray(json && json.pagamentos);
+    data.orcamento = normalizeArray(json && json.orcamento);
+    data.checklist = normalizeArray(json && json.checklist);
+    data.desembolso = normalizeArray(json && json.desembolso);
+    data.projeto = normalizeArray(json && json.projeto);
+    data.socios = normalizeArray(json && json.socios);
+    data.medicoes_cef = normalizeArray(json && json.medicoes_cef);
+    data.documentos = normalizeArray(json && json.documentos);
+    data.aportes = normalizeArray(json && json.aportes);
+    data.riscos = normalizeArray(json && json.riscos);
+    data.proximas_acoes = normalizeArray(json && json.proximas_acoes);
+    data.fases = normalizeArray(json && json.fases);
+    data.log_alteracoes = normalizeArray(json && json.log_alteracoes);
+    data.loaded = true;
+    data.source = src;
+    data.error = null;
+  } catch (err) {
+    data.loaded = false;
+    data.source = 'error';
+    data.error = 'INVALID_PAYLOAD';
+  }
+  return data;
+}
+
+function getProjetoValue(key, fallback) {
+  const row = getDashboardRows('projeto').find(r => String(r.key || '') === String(key));
+  const val = row ? row.value : undefined;
+  return val === undefined || val === null || val === '' ? fallback : val;
+}
+
+function getProjetoNumber(key, fallback) {
+  const val = getProjetoValue(key, null);
+  const num = parseFloat(val);
+  return Number.isFinite(num) ? num : fallback;
+}
+
+function getProjetoDate(key, fallback) {
+  const val = getProjetoValue(key, null);
+  return val ? String(val) : fallback;
+}
+
+function getSocioById(id) {
+  return getDashboardRows('socios').find(r => String(r.socio_id || '') === String(id)) || null;
+}
+
+function getDashboardRows(key) {
+  return normalizeArray(window.dashboardData && window.dashboardData[key]);
+}
+
+function getMedicoesCef() { return getDashboardRows('medicoes_cef'); }
+function getDocumentos() { return getDashboardRows('documentos'); }
+function getAportes() { return getDashboardRows('aportes'); }
+function getRiscos() { return getDashboardRows('riscos'); }
+function getProximasAcoes() { return getDashboardRows('proximas_acoes'); }
+function getFases() { return getDashboardRows('fases'); }
+
+const MEDICOES_FALLBACK = [
+  {medicao_id:'L0',ordem:0,label:'L0',gatilho:'Escritura / aprovação CEF',percentual_obra:'',valor_previsto:390000,status:'pendente'},
+  {medicao_id:'L1',ordem:1,label:'L1',gatilho:'Fundação concluída',percentual_obra:10,valor_previsto:84375,status:'pendente'},
+  {medicao_id:'L2',ordem:2,label:'L2',gatilho:'Estrutura concluída',percentual_obra:20,valor_previsto:168750,status:'pendente'},
+  {medicao_id:'L3',ordem:3,label:'L3',gatilho:'Alvenaria concluída',percentual_obra:20,valor_previsto:168750,status:'pendente'},
+  {medicao_id:'L4',ordem:4,label:'L4',gatilho:'Cobertura concluída',percentual_obra:15,valor_previsto:126563,status:'pendente'},
+  {medicao_id:'L5',ordem:5,label:'L5',gatilho:'Instalações concluídas',percentual_obra:15,valor_previsto:126563,status:'pendente'},
+  {medicao_id:'L6',ordem:6,label:'L6',gatilho:'Acabamentos + Habite-se',percentual_obra:20,valor_previsto:168750,status:'pendente'}
+];
+
+
+
+
+
+const FASES_FALLBACK = [
+  {fase_id:'ccv',ordem:1,nome:'Contrato de Compra e Venda Assinado',descricao:'Sinal R$10.000 pago',data_prevista:'2026-04-28',data_real:'2026-04-28',status:'concluido',responsavel:'Gabriel Acioly',impacto:'Base contratual concluida'},
+  {fase_id:'credito',ordem:2,nome:'Aprovacao de Credito CPF Solicitada',descricao:'CPF Gabriel Acioly em analise na CEF',data_prevista:'',data_real:'',status:'concluido',responsavel:'Gabriel Acioly',impacto:''},
+  {fase_id:'protocolo_cef',ordem:3,nome:'Protocolo do Financiamento na CEF',descricao:'Documentacao PF completa + projetos',data_prevista:'2026-05-12',data_real:'',status:'em_andamento',responsavel:'Gabriel Acioly',impacto:'Prazo critico do CCV'},
+  {fase_id:'laudo_cef',ordem:4,nome:'Laudo de Avaliacao CEF',descricao:'Vistoria tecnica e avaliacao do imovel',data_prevista:'',data_real:'',status:'pendente',responsavel:'',impacto:''},
+  {fase_id:'aprovacao_financiamento',ordem:5,nome:'Aprovacao + Escritura + Liberacao Terreno',descricao:'CEF libera saldo do terreno ao vendedor',data_prevista:'2026-07-27',data_real:'',status:'pendente',responsavel:'Gabriel Acioly',impacto:''},
+  {fase_id:'inicio_obra',ordem:6,nome:'Inicio da Obra + PCI Aprovada',descricao:'Alvara, aprovacao Alphaville e empreiteiro',data_prevista:'',data_real:'',status:'pendente',responsavel:'',impacto:''},
+  {fase_id:'medicoes',ordem:7,nome:'Medicoes e Liberacoes CEF',descricao:'L1 a L6 ao longo da obra',data_prevista:'',data_real:'',status:'pendente',responsavel:'',impacto:''},
+  {fase_id:'entrega',ordem:8,nome:'Habite-se + Averbacao + Entrega',descricao:'Registro cartorio e liberacao final',data_prevista:'',data_real:'',status:'pendente',responsavel:'',impacto:''}
+];
+
+function isDoneStatus(status) {
+  return ['concluido','concluida','recebido','aprovado','validado','dispensado','feito','fechado','encerrado','cancelado'].includes(normalizeStatus(status));
+}
+
+function isOpenStatus(status) {
+  return !isDoneStatus(status);
+}
+
+function getFasesRows() {
+  const rows = getFases().length ? getFases() : FASES_FALLBACK;
+  return rows.slice().map((r, idx) => ({
+    fase_id:r.fase_id || ('fase_' + idx),
+    ordem:Number.isFinite(parseInt(r.ordem)) ? parseInt(r.ordem) : idx + 1,
+    nome:r.nome || r.name || r.titulo || '',
+    descricao:r.descricao || r.desc || '',
+    data_prevista:r.data_prevista || r.prazo || '',
+    data_real:r.data_real || '',
+    status:r.status || 'pendente',
+    responsavel:r.responsavel || '',
+    impacto:r.impacto || r.obs || ''
+  })).sort((a,b) => a.ordem - b.ordem);
+}
+
+function getCriticalDocuments(limit) {
+  const docs = getDocumentosRows();
+  return docs.filter(d => isOpenStatus(d.status) && ['critica','alta'].includes(normalizePrioridade(d.prioridade))).sort((a,b) => {
+    const pr = priorityRank(a.prioridade) - priorityRank(b.prioridade);
+    if (pr !== 0) return pr;
+    const da = Date.parse(a.prazo || '') || 9999999999999;
+    const db = Date.parse(b.prazo || '') || 9999999999999;
+    return da - db;
+  }).slice(0, limit || 5);
+}
+
+function getCriticalRisks(limit) {
+  return getRiscosRows().filter(r => isOpenStatus(r.status) && ['critica','alto'].includes(normalizeSeveridade(r.severidade))).sort((a,b) => {
+    const sr = severityRank(a.severidade) - severityRank(b.severidade);
+    if (sr !== 0) return sr;
+    const da = Date.parse(a.prazo || '') || 9999999999999;
+    const db = Date.parse(b.prazo || '') || 9999999999999;
+    if (da !== db) return da - db;
+    return (toNum(b.impacto_rs) || 0) - (toNum(a.impacto_rs) || 0);
+  }).slice(0, limit || 4);
+}
+
+function getCriticalMedicoes(limit) {
+  const statusRank = s => {
+    const v = normalizeStatus(s);
+    return ['travado','atrasado','reprovado'].includes(v) ? 0 : ['solicitado','em_analise','em analise','em análise'].includes(v) ? 1 : v === 'pendente' ? 2 : 9;
+  };
+  return getMedicoesCefRows().filter(m => statusRank(m.status) < 9).sort((a,b) => statusRank(a.status) - statusRank(b.status) || a.ordem - b.ordem).slice(0, limit || 3);
+}
+
+function getDynamicMainAlert() {
+  const actions = getProximasAcoesRows().filter(a => isOpenStatus(a.status));
+  const dueAction = actions.find(a => { const d = daysUntil(a.prazo); return d !== null && d <= 0; });
+  if (dueAction) return {cls:'alert-red',icon:'!',title:'Acao critica no prazo',body:`${dueAction.titulo} · ${formatPrazoStatus(dueAction.prazo)} · Responsavel: ${dueAction.responsavel || 'sem responsavel'}`};
+  const doc = getCriticalDocuments(10).find(d => { const x = daysUntil(d.prazo); return x !== null && x <= 7; });
+  if (doc) return {cls:'alert-red',icon:'DOC',title:'Documento critico pendente',body:`${doc.documento} · ${formatPrazoStatus(doc.prazo)} · Responsavel: ${doc.responsavel || 'sem responsavel'}`};
+  const risk = getCriticalRisks(1)[0];
+  if (risk) return {cls:'alert-ylw',icon:'!',title:'Risco alto em monitoramento',body:`${risk.risco} · Plano: ${risk.plano_acao || 'sem plano cadastrado'}`};
+  const med = getMedicoesCefRows().find(m => ['travado','atrasado','reprovado'].includes(normalizeStatus(m.status)));
+  if (med) return {cls:'alert-red',icon:'CEF',title:'Medicao CEF com bloqueio',body:`${med.label} · ${formatMedicaoStatus(med.status)} · Pendencia: ${med.pendencia || 'nao informada'}`};
+  const protocolo = actions.find(a => String(a.acao_id || '').includes('protocolar') || normalizeSocioName(a.titulo).includes('protocolar financiamento'));
+  if (protocolo && isOpenStatus(protocolo.status)) return {cls:'alert-ylw',icon:'CEF',title:'Protocolo CEF pendente',body:`${protocolo.titulo} · ${formatPrazoStatus(protocolo.prazo)}`};
+  return {cls:'alert-grn',icon:'OK',title:'Acompanhamento normal',body:'Nenhum bloqueio critico identificado nos dados atuais do dashboard.'};
+}
+
+function calcCockpitKpis(data) {
+  const medResumo = calcMedicoesResumo(data.medicoes);
+  const docsCriticos = getCriticalDocuments(999).length;
+  const riscosAltos = getCriticalRisks(999).length;
+  const acoesPendentes = data.acoes.filter(a => ['pendente','em_andamento','em andamento'].includes(normalizeStatus(a.status))).length;
+  const aportesResumo = calcAportesResumo(data.socios, data.aportes);
+  return {medResumo,docsCriticos,riscosAltos,acoesPendentes,aportesResumo};
+}
+
+function getCockpitData() {
+  const socios = getSociosRows();
+  const aportes = getAportesRows();
+  return {socios,aportes,medicoes:getMedicoesCefRows(),documentos:getDocumentosRows(),riscos:getRiscosRows(),acoes:getProximasAcoesRows(),fases:getFasesRows()};
+}
+
+function cockpitOpenTab(name) {
+  const tab = Array.from(document.querySelectorAll('.tab')).find(t => (t.getAttribute('onclick') || '').includes("'" + name + "'"));
+  if (tab) setTab(name, tab);
+}
+
+function renderCockpitKpis(data) {
+  const k = calcCockpitKpis(data);
+  const el = document.getElementById('cockpit-kpis');
+  if (!el) return;
+  const medTxt = `${fmt(k.medResumo.total_liberado)} / ${fmt(k.medResumo.total_previsto)}`;
+  el.innerHTML = `<div class="kpi kpi-blu"><div class="kpi-lbl">VGV base</div><div class="kpi-val">${fmt(getProjetoNumber('vgv_base',2000000))}</div><div class="kpi-sub">Projeto</div></div><div class="kpi"><div class="kpi-lbl">Custo construcao</div><div class="kpi-val">${fmt(getProjetoNumber('custo_construcao',843750))}</div><div class="kpi-sub">Fallback viabilidade</div></div><div class="kpi kpi-blu"><div class="kpi-lbl">Financiamento CEF</div><div class="kpi-val">${fmt(getProjetoNumber('financiamento_cef',1600000))}</div><div class="kpi-sub">Limite base</div></div><div class="kpi kpi-grn"><div class="kpi-lbl">Medicoes liberadas</div><div class="kpi-val" style="font-size:15px">${medTxt}</div><div class="kpi-sub">${k.medResumo.percentual_liberado.toFixed(1).replace('.',',')}% liberado</div></div><div class="kpi ${k.docsCriticos?'kpi-red':'kpi-grn'}"><div class="kpi-lbl">Docs criticos pendentes</div><div class="kpi-val">${k.docsCriticos}</div><div class="kpi-sub">Critica/alta</div></div><div class="kpi ${k.riscosAltos?'kpi-red':'kpi-grn'}"><div class="kpi-lbl">Riscos altos abertos</div><div class="kpi-val">${k.riscosAltos}</div><div class="kpi-sub">Alto/critico</div></div><div class="kpi kpi-ylw"><div class="kpi-lbl">Acoes pendentes</div><div class="kpi-val">${k.acoesPendentes}</div><div class="kpi-sub">Pendente/em andamento</div></div><div class="kpi kpi-grn"><div class="kpi-lbl">Total aportado</div><div class="kpi-val">${fmt(k.aportesResumo.total_aportado)}</div><div class="kpi-sub">${k.aportesResumo.qtd_aportes} aportes</div></div>`;
+}
+
+function renderCockpitFases(data) {
+  const el = document.getElementById('cockpit-fases');
+  if (!el) return;
+  el.innerHTML = data.fases.map(f => {
+    const s = normalizeStatus(f.status);
+    const cls = ['concluido','concluida','feito'].includes(s) ? 'done' : ['em_andamento','em andamento'].includes(s) ? 'active' : ['atrasado','travado'].includes(s) ? 'active' : 'pending';
+    const icon = cls === 'done' ? 'OK' : cls === 'active' ? '...' : '--';
+    const color = ['atrasado','travado'].includes(s) ? 'color:var(--red)' : '';
+    const date = f.data_real || f.data_prevista || '';
+    return `<div class="fase ${cls}"><div style="font-size:12px;min-width:24px">${icon}</div><div><div class="fase-name">${escapeHtml(f.nome || '—')}</div><div class="fase-desc">${escapeHtml(f.descricao || f.impacto || '—')}</div></div><div class="fase-date" style="${color}">${date ? formatDateBr(date) : escapeHtml(f.status || 'pendente')}</div></div>`;
+  }).join('');
+}
+
+function renderCockpitRecommendations(data) {
+  const recs = [];
+  const criticalAction = getCriticalAction(data.acoes);
+  if (criticalAction && daysUntil(criticalAction.prazo) !== null && daysUntil(criticalAction.prazo) <= 0) recs.push({titulo:criticalAction.titulo,origem:'acao',responsavel:criticalAction.responsavel,prazo:criticalAction.prazo,status:formatPrazoStatus(criticalAction.prazo)});
+  getCriticalDocuments(2).forEach(d => recs.push({titulo:d.documento,origem:'documento',responsavel:d.responsavel,prazo:d.prazo,status:formatPrazoStatus(d.prazo)}));
+  getCriticalRisks(2).filter(r => !String(r.responsavel||'').trim()).forEach(r => recs.push({titulo:r.risco,origem:'risco sem responsavel',responsavel:r.responsavel,prazo:r.prazo,status:r.plano_acao || 'Definir responsavel'}));
+  getCriticalMedicoes(1).filter(m => ['travado','atrasado','reprovado'].includes(normalizeStatus(m.status))).forEach(m => recs.push({titulo:m.label + ' - ' + m.gatilho,origem:'medicao CEF',responsavel:m.responsavel,prazo:m.data_prevista,status:formatMedicaoStatus(m.status)}));
+  const conta = calcContaCorrenteSocios(data.socios, data.aportes).sort((a,b) => Math.abs(b.saldo) - Math.abs(a.saldo));
+  if (conta[0] && Math.abs(conta[0].saldo) > 0.01) recs.push({titulo:'Revisar saldo proporcional de ' + conta[0].nome,origem:'socios',responsavel:conta[0].nome,prazo:'',status:formatMoneySigned(conta[0].saldo)});
+  data.fases.filter(f => normalizeStatus(f.status) === 'pendente' && daysUntil(f.data_prevista) !== null && daysUntil(f.data_prevista) <= 15).slice(0,1).forEach(f => recs.push({titulo:f.nome,origem:'fase',responsavel:f.responsavel,prazo:f.data_prevista,status:formatPrazoStatus(f.data_prevista)}));
+  const unique = [];
+  recs.forEach(r => { if (unique.length < 5 && !unique.some(x => x.titulo === r.titulo && x.origem === r.origem)) unique.push(r); });
+  const el = document.getElementById('cockpit-recommendations');
+  if (!el) return;
+  el.innerHTML = unique.length ? unique.map(r => `<div class="detalhe-item"><div class="d-dot d-prop"></div><div style="flex:1"><div class="d-desc">${escapeHtml(r.titulo || '—')}</div><div class="d-sub">${escapeHtml(r.origem || '—')} · ${escapeHtml(r.responsavel || 'sem responsavel')}</div></div><div class="d-quando">${r.prazo ? formatDateBr(r.prazo) : '—'}</div><span class="tag tag-ylw">${escapeHtml(r.status || '—')}</span></div>`).join('') : '<div class="card" style="color:var(--mut)">Nenhuma recomendacao automatica critica no momento.</div>';
+}
+
+function renderCockpit() {
+  const data = getCockpitData();
+  const alert = getDynamicMainAlert();
+  const alertEl = document.getElementById('cockpit-main-alert');
+  if (alertEl) alertEl.innerHTML = `<div class="alert ${alert.cls}"><div class="alert-icon">${escapeHtml(alert.icon)}</div><div><div class="alert-title">${escapeHtml(alert.title)}</div><div class="alert-body">${escapeHtml(alert.body)}</div></div></div>`;
+  const critical = getCriticalAction(data.acoes);
+  const criticalEl = document.getElementById('cockpit-critical-action');
+  if (criticalEl) criticalEl.innerHTML = critical ? `<div class="card" style="border-color:var(--ylw)"><div style="display:flex;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${escapeHtml(critical.titulo || '—')}</div><div style="font-size:11px;color:var(--mut);margin-top:4px">${escapeHtml(critical.origem || '—')} · ${renderRefId(critical.ref_id)}</div></div><span class="tag ${getPriorityTagClass(critical.prioridade)}">${formatRiskLabel(critical.prioridade)}</span></div><div class="vrow"><span style="color:var(--mut)">Responsavel</span><span>${escapeHtml(critical.responsavel || '—')}</span></div><div class="vrow"><span style="color:var(--mut)">Prazo</span><span>${formatDateBr(critical.prazo)} · ${formatPrazoStatus(critical.prazo)}</span></div></div>` : '<div class="card" style="color:var(--mut)">Nenhuma acao critica pendente.</div>';
+  renderCockpitKpis(data);
+  renderCockpitCef(data);
+  renderCockpitDocs(data);
+  renderCockpitRisks(data);
+  renderCockpitSocios(data);
+  renderCockpitFases(data);
+  renderCockpitRecommendations(data);
+}
+
+function renderCockpitCef(data) {
+  const r = calcMedicoesResumo(data.medicoes);
+  const med = getCriticalMedicoes(3);
+  const el = document.getElementById('cockpit-cef');
+  if (!el) return;
+  el.innerHTML = `<div class="card"><div class="vrow"><span style="color:var(--mut)">Previsto</span><span>${fmt(r.total_previsto)}</span></div><div class="vrow"><span style="color:var(--mut)">Liberado</span><span style="color:var(--grn)">${fmt(r.total_liberado)}</span></div><div class="vrow"><span style="color:var(--mut)">Saldo</span><span>${fmt(r.saldo_a_liberar)}</span></div><div class="vrow"><span style="color:var(--mut)">% liberado</span><span>${r.percentual_liberado.toFixed(1).replace('.',',')}%</span></div><div style="margin-top:8px">${med.map(m => `<div class="detalhe-item"><div class="d-dot d-cef"></div><div style="flex:1"><div class="d-desc">${escapeHtml(m.label)} · ${escapeHtml(m.gatilho || '—')}</div></div><span class="tag ${getStatusTagClass(m.status)}">${formatMedicaoStatus(m.status)}</span></div>`).join('') || '<div style="font-size:11px;color:var(--mut)">Nenhuma medicao critica.</div>'}</div><button class="filter-btn" onclick="cockpitOpenTab('medicoes')" style="margin-top:10px">Ver aba Medicoes CEF</button></div>`;
+}
+
+function renderCockpitDocs(data) {
+  const docs = data.documentos;
+  const crit = getCriticalDocuments(5);
+  const vencidos = crit.filter(d => { const x = daysUntil(d.prazo); return x !== null && x < 0; }).length;
+  const semResp = crit.filter(d => !String(d.responsavel || '').trim()).length;
+  const el = document.getElementById('cockpit-docs');
+  if (!el) return;
+  el.innerHTML = `<div class="card"><div class="vrow"><span style="color:var(--mut)">Total</span><span>${docs.length}</span></div><div class="vrow"><span style="color:var(--mut)">Criticos/alta pendentes</span><span>${crit.length}</span></div><div class="vrow"><span style="color:var(--mut)">Vencidos</span><span>${vencidos}</span></div><div class="vrow"><span style="color:var(--mut)">Sem responsavel</span><span>${semResp}</span></div><div style="margin-top:8px">${crit.map(d => `<div class="detalhe-item"><div class="d-dot d-prop"></div><div style="flex:1"><div class="d-desc">${escapeHtml(d.documento || '—')}</div><div class="d-sub">${formatPrazoStatus(d.prazo)}</div></div><span class="tag ${getPrioridadeTagClass(d.prioridade)}">${formatPrioridade(d.prioridade)}</span></div>`).join('') || '<div style="font-size:11px;color:var(--mut)">Nenhum documento critico pendente.</div>'}</div></div>`;
+}
+
+function renderCockpitRisks(data) {
+  const risks = getCriticalRisks(4);
+  const resumo = calcRiscosResumo(data.riscos);
+  const el = document.getElementById('cockpit-risks');
+  if (!el) return;
+  el.innerHTML = `<div class="card"><div class="vrow"><span style="color:var(--mut)">Riscos altos</span><span>${resumo.riscos_altos}</span></div><div class="vrow"><span style="color:var(--mut)">Impacto financeiro</span><span>${fmt(resumo.impacto_rs_total)}</span></div><div class="vrow"><span style="color:var(--mut)">Sem responsavel</span><span>${resumo.riscos_sem_responsavel}</span></div><div style="margin-top:8px">${risks.map(r => `<div class="detalhe-item"><div class="d-dot d-prop"></div><div style="flex:1"><div class="d-desc">${escapeHtml(r.risco || '—')}</div><div class="d-sub">${escapeHtml(r.responsavel || 'sem responsavel')}</div></div><span class="tag ${getSeverityTagClass(r.severidade)}">${formatRiskLabel(r.severidade)}</span></div>`).join('') || '<div style="font-size:11px;color:var(--mut)">Nenhum risco alto aberto.</div>'}</div></div>`;
+}
+
+function renderCockpitSocios(data) {
+  const resumo = calcAportesResumo(data.socios, data.aportes);
+  const conta = calcContaCorrenteSocios(data.socios, data.aportes);
+  const pos = conta.slice().sort((a,b) => b.saldo - a.saldo)[0];
+  const neg = conta.slice().sort((a,b) => a.saldo - b.saldo)[0];
+  const el = document.getElementById('cockpit-socios');
+  if (!el) return;
+  el.innerHTML = `<div class="card"><div class="vrow"><span style="color:var(--mut)">Total aportado</span><span>${fmt(resumo.total_aportado)}</span></div><div class="vrow"><span style="color:var(--mut)">Maior saldo positivo</span><span>${pos ? escapeHtml(pos.nome) + ' · ' + formatMoneySigned(pos.saldo) : '—'}</span></div><div class="vrow"><span style="color:var(--mut)">Maior saldo negativo</span><span>${neg ? escapeHtml(neg.nome) + ' · ' + formatMoneySigned(neg.saldo) : '—'}</span></div><div class="vrow"><span style="color:var(--mut)">Qtd. aportes</span><span>${resumo.qtd_aportes}</span></div><div style="font-size:11px;color:var(--mut);line-height:1.4;margin-top:8px">Pagamentos diretos a fornecedores so entram na conta societaria quando classificados como aporte.</div></div>`;
+}
+const RISCOS_FALLBACK = [
+  {risco_id:'risco_protocolo_cef',categoria:'CEF',risco:'Perda do prazo de protocolo CEF',probabilidade:'media',impacto:'alto',impacto_rs:10000,impacto_prazo_dias:'',severidade:'alto',status:'aberto',responsavel:'Gabriel Acioly',plano_acao:'Protocolar financiamento ate 12/05/2026',prazo:'2026-05-12',obs:'Risco de retencao do sinal'},
+  {risco_id:'risco_aprovacao_cef',categoria:'CEF',risco:'Financiamento nao aprovado no prazo contratual',probabilidade:'baixa',impacto:'alto',impacto_rs:'',impacto_prazo_dias:'',severidade:'medio',status:'monitorar',responsavel:'Gabriel Acioly',plano_acao:'Acompanhar analise e pendencias com CEF',prazo:'2026-07-27',obs:''},
+  {risco_id:'risco_estouro_obra',categoria:'Orcamento',risco:'Custo de obra superar orcamento base',probabilidade:'media',impacto:'alto',impacto_rs:'',impacto_prazo_dias:'',severidade:'alto',status:'monitorar',responsavel:'',plano_acao:'Atualizar orcamento contratado e tendencia final',prazo:'',obs:''},
+  {risco_id:'risco_atraso_medicoes',categoria:'Caixa',risco:'Atraso nas liberacoes da CEF',probabilidade:'media',impacto:'alto',impacto_rs:'',impacto_prazo_dias:'',severidade:'alto',status:'monitorar',responsavel:'',plano_acao:'Controlar medicoes L0-L6 e caixa proprio necessario',prazo:'',obs:''}
+];
+const ACOES_FALLBACK = [
+  {acao_id:'acao_republicar_apps_script',titulo:'Republicar Apps Script atualizado',categoria:'sistema',responsavel:'Gabriel Acioly',prazo:'',prioridade:'alta',status:'pendente',origem:'fase1',ref_id:'',obs:''},
+  {acao_id:'acao_protocolar_cef',titulo:'Protocolar financiamento na CEF',categoria:'CEF',responsavel:'Gabriel Acioly',prazo:'2026-05-12',prioridade:'critica',status:'pendente',origem:'contrato',ref_id:'doc_protocolo_cef',obs:''},
+  {acao_id:'acao_validar_abas_sheets',titulo:'Validar criacao das abas do Sheets',categoria:'sistema',responsavel:'Gabriel Acioly',prazo:'',prioridade:'alta',status:'pendente',origem:'fase2',ref_id:'',obs:''},
+  {acao_id:'acao_conferir_documentos_cef',titulo:'Conferir documentos exigidos pela CEF',categoria:'CEF',responsavel:'Gabriel Acioly',prazo:'',prioridade:'alta',status:'pendente',origem:'documentos',ref_id:'',obs:''}
+];
+function normalizePrioridade(value){const v=normalizeSocioName(value).replace(/_/g,' ');if(v==='critica'||v==='critico')return'critica';if(v==='alta'||v==='alto')return'alta';if(v==='media'||v==='medio')return'media';if(v==='baixa'||v==='baixo')return'baixa';return v||'media'}
+function normalizeSeveridade(value){const v=normalizePrioridade(value);if(v==='critica')return'critica';if(v==='alta')return'alto';if(v==='media')return'medio';if(v==='baixa')return'baixo';return v||'medio'}
+function priorityRank(value){const p=normalizePrioridade(value);return p==='critica'?0:p==='alta'?1:p==='media'?2:p==='baixa'?3:9}
+function severityRank(value){const s=normalizeSeveridade(value);return s==='critica'?0:s==='alto'?1:s==='medio'?2:s==='baixo'?3:9}
+function getRiscosRows(){const rows=getRiscos().length?getRiscos():RISCOS_FALLBACK;return rows.slice().map((r,idx)=>({risco_id:r.risco_id||('risco_'+idx),categoria:r.categoria||'',risco:r.risco||r.titulo||'',probabilidade:r.probabilidade||'',impacto:r.impacto||'',impacto_rs:toNum(r.impacto_rs),impacto_prazo_dias:toNum(r.impacto_prazo_dias),severidade:r.severidade||'medio',status:r.status||'monitorar',responsavel:r.responsavel||'',plano_acao:r.plano_acao||r.acao||'',prazo:r.prazo||'',obs:r.obs||''})).sort((a,b)=>{const sr=severityRank(a.severidade)-severityRank(b.severidade);if(sr!==0)return sr;const da=Date.parse(a.prazo||'')||9999999999999;const db=Date.parse(b.prazo||'')||9999999999999;return da-db})}
+function getProximasAcoesRows(){const rows=getProximasAcoes().length?getProximasAcoes():ACOES_FALLBACK;return rows.slice().map((r,idx)=>({acao_id:r.acao_id||('acao_'+idx),titulo:r.titulo||r.acao||'',categoria:r.categoria||'',responsavel:r.responsavel||'',prazo:r.prazo||'',prioridade:r.prioridade||'media',status:r.status||'pendente',origem:r.origem||'',ref_id:r.ref_id||r.referencia||'',obs:r.obs||''})).sort((a,b)=>{const pr=priorityRank(a.prioridade)-priorityRank(b.prioridade);if(pr!==0)return pr;const da=Date.parse(a.prazo||'')||9999999999999;const db=Date.parse(b.prazo||'')||9999999999999;return da-db})}
+function calcRiscosResumo(riscos){return{total_riscos:riscos.length,riscos_abertos:riscos.filter(r=>!['concluido','fechado','cancelado'].includes(normalizeStatus(r.status))).length,riscos_altos:riscos.filter(r=>['critica','alto'].includes(normalizeSeveridade(r.severidade))).length,riscos_com_impacto_rs:riscos.filter(r=>(toNum(r.impacto_rs)||0)>0).length,impacto_rs_total:riscos.reduce((s,r)=>s+(toNum(r.impacto_rs)||0),0),riscos_sem_responsavel:riscos.filter(r=>!String(r.responsavel||'').trim()).length}}
+function calcAcoesResumo(acoes){const abertas=acoes.filter(a=>!['concluido','concluida','feito','cancelado'].includes(normalizeStatus(a.status)));const prazos=abertas.map(a=>a.prazo).filter(Boolean).sort((a,b)=>(Date.parse(a)||0)-(Date.parse(b)||0));return{total_acoes:acoes.length,acoes_pendentes:abertas.length,acoes_criticas:abertas.filter(a=>normalizePrioridade(a.prioridade)==='critica').length,acoes_vencidas:abertas.filter(a=>{const d=daysUntil(a.prazo);return d!==null&&d<0}).length,acoes_sem_responsavel:abertas.filter(a=>!String(a.responsavel||'').trim()).length,proximo_prazo:prazos[0]||''}}
+function getPriorityTagClass(value){const p=normalizePrioridade(value);if(p==='critica')return'tag-red';if(p==='alta')return'tag-ylw';if(p==='baixa')return'tag-blu';return'tag-gray'}
+function getSeverityTagClass(value){const s=normalizeSeveridade(value);if(s==='critica'||s==='alto')return'tag-red';if(s==='medio')return'tag-ylw';if(s==='baixo')return'tag-blu';return'tag-gray'}
+function getRiskRowClass(row){const s=normalizeSeveridade(row.severidade);if(s==='critica'||s==='alto')return'row-red';if(normalizeStatus(row.status)==='monitorar')return'row-total';return''}
+function getActionRowClass(row){const d=daysUntil(row.prazo);if(normalizePrioridade(row.prioridade)==='critica'||(d!==null&&d<0))return'row-red';return''}
+function daysUntil(dateStr){const raw=String(dateStr||'').trim();if(!raw)return null;const target=new Date(raw.slice(0,10)+'T00:00:00');if(isNaN(target.getTime()))return null;const now=new Date();const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());return Math.round((target.getTime()-today.getTime())/86400000)}
+function formatPrazoStatus(dateStr){const d=daysUntil(dateStr);if(d===null)return'—';if(d<0)return'Vencido ha '+Math.abs(d)+' dias';if(d===0)return'Vence hoje';return'Em '+d+' dias'}
+function formatRiskLabel(value,fallback){const raw=String(value||'').trim();return raw?escapeHtml(raw.charAt(0).toUpperCase()+raw.slice(1)):(fallback||'—')}
+function renderRefId(value){const raw=String(value||'').trim();if(!raw)return'<span style="color:var(--mut)">—</span>';const url=safeUrl(raw);if(url)return renderDocRef(url);return escapeHtml(raw)}
+function getCriticalAction(acoes){return acoes.filter(a=>!['concluido','concluida','feito','cancelado'].includes(normalizeStatus(a.status))).sort((a,b)=>{const pr=priorityRank(a.prioridade)-priorityRank(b.prioridade);if(pr!==0)return pr;const da=Date.parse(a.prazo||'')||9999999999999;const db=Date.parse(b.prazo||'')||9999999999999;return da-db})[0]||null}
+function renderRiscosAcoes(){const riscos=getRiscosRows();const acoes=getProximasAcoesRows();const rr=calcRiscosResumo(riscos);const ar=calcAcoesResumo(acoes);const kpis=document.getElementById('risk-kpis');if(kpis){kpis.innerHTML=`<div class="kpi"><div class="kpi-lbl">Total de riscos</div><div class="kpi-val">${rr.total_riscos}</div><div class="kpi-sub">${rr.riscos_abertos} abertos</div></div><div class="kpi kpi-red"><div class="kpi-lbl">Riscos altos</div><div class="kpi-val">${rr.riscos_altos}</div><div class="kpi-sub">Alto/critico</div></div><div class="kpi kpi-ylw"><div class="kpi-lbl">Impacto financeiro</div><div class="kpi-val">${fmt(rr.impacto_rs_total)}</div><div class="kpi-sub">${rr.riscos_com_impacto_rs} mapeados</div></div><div class="kpi ${rr.riscos_sem_responsavel?'kpi-red':'kpi-grn'}"><div class="kpi-lbl">Riscos sem responsavel</div><div class="kpi-val">${rr.riscos_sem_responsavel}</div><div class="kpi-sub">Atribuicao pendente</div></div><div class="kpi kpi-blu"><div class="kpi-lbl">Acoes pendentes</div><div class="kpi-val">${ar.acoes_pendentes}</div><div class="kpi-sub">Proximo: ${formatPrazoStatus(ar.proximo_prazo)}</div></div><div class="kpi ${ar.acoes_criticas||ar.acoes_vencidas?'kpi-red':'kpi-grn'}"><div class="kpi-lbl">Criticas/vencidas</div><div class="kpi-val">${ar.acoes_criticas+ar.acoes_vencidas}</div><div class="kpi-sub">${ar.acoes_vencidas} vencidas</div></div>`}const critical=getCriticalAction(acoes);const criticalEl=document.getElementById('risk-critical-action');if(criticalEl){criticalEl.innerHTML=critical?`<div class="card" style="border-color:var(--red)"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><div style="font-size:15px;font-weight:700;color:#fff">${escapeHtml(critical.titulo||'—')}</div><div style="font-size:11px;color:var(--mut);margin-top:4px">${escapeHtml(critical.categoria||'—')} · ${escapeHtml(critical.responsavel||'Sem responsavel')}</div></div><span class="tag ${getPriorityTagClass(critical.prioridade)}">${formatRiskLabel(critical.prioridade)}</span></div><div class="vrow"><span style="color:var(--mut)">Prazo</span><span>${formatDateBr(critical.prazo)} · ${formatPrazoStatus(critical.prazo)}</span></div><div class="vrow"><span style="color:var(--mut)">Status</span><span>${escapeHtml(critical.status||'pendente')}</span></div></div>`:'<div class="card" style="color:var(--mut)">Nenhuma acao critica pendente</div>'}const riskTable=document.getElementById('risk-table-body');if(riskTable){riskTable.innerHTML=riscos.map(r=>`<tr class="${getRiskRowClass(r)}"><td><span class="tag tag-gray">${escapeHtml(r.categoria||'—')}</span></td><td><strong>${escapeHtml(r.risco||'—')}</strong></td><td>${formatRiskLabel(r.probabilidade)}</td><td>${formatRiskLabel(r.impacto)}</td><td><span class="tag ${getSeverityTagClass(r.severidade)}">${formatRiskLabel(r.severidade)}</span></td><td>${r.impacto_rs?fmt(r.impacto_rs):'<span class="val-empty">—</span>'}</td><td style="white-space:nowrap">${formatDateBr(r.prazo)}<div style="font-size:10px;color:var(--mut)">${formatPrazoStatus(r.prazo)}</div></td><td><span class="tag tag-gray">${escapeHtml(r.status||'—')}</span></td><td>${emptyDash(r.responsavel)}</td><td>${emptyDash(r.plano_acao)}</td></tr>`).join('')||'<tr><td colspan="10" style="text-align:center;color:var(--mut);padding:20px">Nenhum risco cadastrado</td></tr>'}const riskCards=document.getElementById('risk-cards');if(riskCards){riskCards.innerHTML=riscos.map(r=>`<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:8px"><div><div style="font-size:13px;font-weight:700;color:#fff;line-height:1.35">${escapeHtml(r.risco||'—')}</div><div style="font-size:10px;color:var(--mut);margin-top:2px">${escapeHtml(r.categoria||'—')}</div></div><span class="tag ${getSeverityTagClass(r.severidade)}">${formatRiskLabel(r.severidade)}</span></div><div class="vrow"><span style="color:var(--mut)">Prazo</span><span>${formatPrazoStatus(r.prazo)}</span></div><div class="vrow"><span style="color:var(--mut)">Responsavel</span><span>${escapeHtml(r.responsavel||'—')}</span></div><div style="font-size:11px;color:var(--mut);line-height:1.4;margin-top:8px">${escapeHtml(r.plano_acao||'—')}</div></div>`).join('')}const actionTable=document.getElementById('action-table-body');if(actionTable){actionTable.innerHTML=acoes.map(a=>`<tr class="${getActionRowClass(a)}"><td><span class="tag ${getPriorityTagClass(a.prioridade)}">${formatRiskLabel(a.prioridade)}</span></td><td><strong>${escapeHtml(a.titulo||'—')}</strong></td><td>${escapeHtml(a.categoria||'—')}</td><td>${escapeHtml(a.responsavel||'—')}</td><td style="white-space:nowrap">${formatDateBr(a.prazo)}<div style="font-size:10px;color:var(--mut)">${formatPrazoStatus(a.prazo)}</div></td><td><span class="tag tag-gray">${escapeHtml(a.status||'—')}</span></td><td>${escapeHtml(a.origem||'—')}</td><td>${renderRefId(a.ref_id)}</td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--mut);padding:20px">Nenhuma acao cadastrada</td></tr>'}const actionCards=document.getElementById('action-cards');if(actionCards){actionCards.innerHTML=acoes.map(a=>`<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:8px"><div><div style="font-size:13px;font-weight:700;color:#fff;line-height:1.35">${escapeHtml(a.titulo||'—')}</div><div style="font-size:10px;color:var(--mut);margin-top:2px">${escapeHtml(a.categoria||'—')}</div></div><span class="tag ${getPriorityTagClass(a.prioridade)}">${formatRiskLabel(a.prioridade)}</span></div><div class="vrow"><span style="color:var(--mut)">Prazo</span><span>${formatPrazoStatus(a.prazo)}</span></div><div class="vrow"><span style="color:var(--mut)">Responsavel</span><span>${escapeHtml(a.responsavel||'—')}</span></div><div class="vrow"><span style="color:var(--mut)">Status</span><span>${escapeHtml(a.status||'—')}</span></div><div class="vrow"><span style="color:var(--mut)">Referencia</span><span>${renderRefId(a.ref_id)}</span></div></div>`).join('')}}
+const SOCIOS_FALLBACK = [
+  {socio_id:'gabriel',nome:'Gabriel Acioly',papel:'Socio / gestor',participacao_pct:33.3333,status:'ativo'},
+  {socio_id:'gilberto',nome:'Gilberto Costa',papel:'Socio',participacao_pct:33.3333,status:'ativo'},
+  {socio_id:'raphael',nome:'Raphael Alves',papel:'Socio',participacao_pct:33.3333,status:'ativo'}
+];
+
+function normalizeSocioName(value) {
+  return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function getSociosRows() {
+  const rows = getDashboardRows('socios').length ? getDashboardRows('socios') : SOCIOS_FALLBACK;
+  const order = {gabriel:0, gilberto:1, raphael:2};
+  return rows.slice().map((r, idx) => {
+    const nome = r.nome || r.name || r.socio || r.socio_nome || '';
+    const inferred = normalizeSocioName(r.socio_id || nome).split(' ')[0];
+    return {socio_id:r.socio_id || inferred || ('socio_' + idx),nome,papel:r.papel || r.role || 'Socio',participacao_pct:toNum(r.participacao_pct ?? r.percentual ?? r.participacao) ?? 0,status:r.status || 'ativo'};
+  }).sort((a,b) => {
+    const oa = order[normalizeSocioName(a.socio_id).split('_')[0]] ?? order[normalizeSocioName(a.nome).split(' ')[0]] ?? 99;
+    const ob = order[normalizeSocioName(b.socio_id).split('_')[0]] ?? order[normalizeSocioName(b.nome).split(' ')[0]] ?? 99;
+    return oa === ob ? String(a.nome).localeCompare(String(b.nome), 'pt-BR') : oa - ob;
+  });
+}
+
+function findSocioForAporte(socios, value) {
+  const key = normalizeSocioName(value);
+  if (!key) return null;
+  return socios.find(s => {
+    const nome = normalizeSocioName(s.nome);
+    const id = normalizeSocioName(s.socio_id);
+    return key === nome || key === id || nome.includes(key) || key.includes(nome) || id.includes(key);
+  }) || null;
+}
+
+function sortAportesByDateDesc(a, b) {
+  const da = Date.parse(a.data || '') || 0;
+  const db = Date.parse(b.data || '') || 0;
+  if (db !== da) return db - da;
+  return String(b.aporte_id || '').localeCompare(String(a.aporte_id || ''), 'pt-BR');
+}
+
+function getAportesRows() {
+  const socios = getSociosRows();
+  const aportes = getAportes();
+  if (aportes.length) {
+    return aportes.map((r, idx) => {
+      const socio = findSocioForAporte(socios, r.socio || r.socio_id || r.nome_socio) || {};
+      return {aporte_id:r.aporte_id || ('aporte_' + idx),data:r.data || '',socio_id:r.socio_id || socio.socio_id || '',socio:r.socio || socio.nome || r.nome_socio || '',tipo:r.tipo || 'Aporte',valor:toNum(r.valor) || 0,descricao:r.descricao || r.desc || '',doc_ref:r.doc_ref || '',status:r.status || 'registrado',obs:r.obs || '',origem:'Aportes'};
+    }).sort(sortAportesByDateDesc);
+  }
+  return normalizeArray(window.dashboardData && window.dashboardData.pagamentos).filter(r => String(r.tipo || '').toUpperCase() === 'ENTRADA').map((r, idx) => {
+    const socio = findSocioForAporte(socios, r.de_para) || {};
+    return {aporte_id:'legacy_' + idx,data:r.data || '',socio_id:socio.socio_id || '',socio:socio.nome || r.de_para || '',tipo:r.categoria || 'Entrada',valor:toNum(r.valor) || 0,descricao:r.descricao || '',doc_ref:r.doc_ref || '',status:'registrado',obs:r.obs || '',origem:'Pagamentos legado'};
+  }).sort(sortAportesByDateDesc);
+}
+
+function calcAportesResumo(socios, aportes) {
+  const totalPorSocio = {};
+  socios.forEach(s => { totalPorSocio[s.socio_id] = 0; });
+  aportes.forEach(a => {
+    const socio = findSocioForAporte(socios, a.socio_id || a.socio) || {};
+    const key = socio.socio_id || a.socio_id || a.socio || 'sem_socio';
+    totalPorSocio[key] = (totalPorSocio[key] || 0) + (toNum(a.valor) || 0);
+  });
+  const totalAportado = Object.values(totalPorSocio).reduce((s,v) => s + v, 0);
+  const percentualPorSocio = {};
+  Object.keys(totalPorSocio).forEach(k => { percentualPorSocio[k] = totalAportado ? totalPorSocio[k] / totalAportado * 100 : 0; });
+  const origem = aportes.some(a => a.origem === 'Aportes') ? 'Aportes' : 'Pagamentos legado';
+  return {total_aportado:totalAportado,total_por_socio:totalPorSocio,percentual_por_socio:percentualPorSocio,qtd_aportes:aportes.length,socios_ativos:socios.filter(s => normalizeStatus(s.status) === 'ativo').length,origem_dados:aportes.length ? origem : 'Sem registros'};
+}
+
+function calcContaCorrenteSocios(socios, aportes) {
+  const resumo = calcAportesResumo(socios, aportes);
+  return socios.map(s => {
+    const aportado = resumo.total_por_socio[s.socio_id] || 0;
+    const esperado = resumo.total_aportado * ((toNum(s.participacao_pct) || 0) / 100);
+    const saldo = aportado - esperado;
+    return Object.assign({}, s, {aportado, esperado, saldo});
+  });
+}
+
+function formatPercent(value) {
+  const n = toNum(value) || 0;
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '%';
+}
+
+function formatMoneySigned(value) {
+  const n = toNum(value) || 0;
+  if (Math.abs(n) < 0.01) return fmt(0);
+  return (n > 0 ? '+' : '-') + fmt(Math.abs(n));
+}
+
+function getSaldoClass(value) {
+  const n = toNum(value) || 0;
+  if (n > 0.01) return 'tag-grn';
+  if (n < -0.01) return 'tag-red';
+  return 'tag-gray';
+}
+
+function renderAporteDocRef(value) { return renderDocRef(value); }
+
+function formatAporteStatus(status) {
+  const s = normalizeStatus(status);
+  const labels = {registrado:'Registrado',confirmado:'Confirmado',pendente:'Pendente',cancelado:'Cancelado',previsto:'Previsto'};
+  return labels[s] || escapeHtml(status || 'Registrado');
+}
+
+function getAporteStatusClass(status) {
+  const s = normalizeStatus(status);
+  if (s === 'confirmado' || s === 'registrado') return 'tag-grn';
+  if (s === 'previsto' || s === 'pendente') return 'tag-ylw';
+  if (s === 'cancelado') return 'tag-red';
+  return 'tag-gray';
+}
+
+function renderSociosAportes() {
+  const socios = getSociosRows();
+  const aportes = getAportesRows();
+  const resumo = calcAportesResumo(socios, aportes);
+  const conta = calcContaCorrenteSocios(socios, aportes);
+  const maiorPos = conta.reduce((m,s) => s.saldo > m ? s.saldo : m, 0);
+  const maiorNeg = conta.reduce((m,s) => s.saldo < m ? s.saldo : m, 0);
+  const kpis = document.getElementById('soc-kpis');
+  if (kpis) {
+    kpis.innerHTML = `
+      <div class="kpi kpi-grn"><div class="kpi-lbl">Total aportado</div><div class="kpi-val">${fmt(resumo.total_aportado)}</div><div class="kpi-sub">Base proporcional</div></div>
+      <div class="kpi"><div class="kpi-lbl">Socios ativos</div><div class="kpi-val">${resumo.socios_ativos}</div><div class="kpi-sub">Participacao societaria</div></div>
+      <div class="kpi kpi-blu"><div class="kpi-lbl">Qtd. aportes</div><div class="kpi-val">${resumo.qtd_aportes}</div><div class="kpi-sub">Lancamentos considerados</div></div>
+      <div class="kpi"><div class="kpi-lbl">Origem dos dados</div><div class="kpi-val" style="font-size:14px">${escapeHtml(resumo.origem_dados)}</div><div class="kpi-sub">Leitura atual</div></div>
+      <div class="kpi kpi-grn"><div class="kpi-lbl">Maior saldo positivo</div><div class="kpi-val">${formatMoneySigned(maiorPos)}</div><div class="kpi-sub">Acima da proporcao</div></div>
+      <div class="kpi kpi-red"><div class="kpi-lbl">Maior saldo negativo</div><div class="kpi-val">${formatMoneySigned(maiorNeg)}</div><div class="kpi-sub">Abaixo da proporcao</div></div>
+    `;
+  }
+  const cards = document.getElementById('soc-cards');
+  if (cards) {
+    cards.innerHTML = conta.map(s => {
+      const saldoClass = getSaldoClass(s.saldo);
+      const status = Math.abs(s.saldo) < 0.01 ? 'Equilibrado' : s.saldo > 0 ? 'Acima da proporcao' : 'Abaixo da proporcao';
+      return `<div class="card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px"><div><div style="font-size:14px;font-weight:700;color:#fff">${escapeHtml(s.nome || '—')}</div><div style="font-size:10px;color:var(--mut);margin-top:2px">${escapeHtml(s.papel || 'Socio')}</div></div><span class="tag ${normalizeStatus(s.status) === 'ativo' ? 'tag-grn' : 'tag-gray'}">${escapeHtml(s.status || 'ativo')}</span></div><div class="vrow"><span style="color:var(--mut)">Participacao</span><span>${formatPercent(s.participacao_pct)}</span></div><div class="vrow"><span style="color:var(--mut)">Total aportado</span><span>${fmt(s.aportado)}</span></div><div class="vrow"><span style="color:var(--mut)">Esperado proporcional</span><span>${fmt(s.esperado)}</span></div><div class="vrow"><span style="color:var(--mut)">Saldo</span><span class="tag ${saldoClass}">${formatMoneySigned(s.saldo)}</span></div><div style="font-size:11px;color:var(--mut);margin-top:8px"><span class="tag ${saldoClass}">${status}</span></div></div>`;
+    }).join('') || '<div class="card" style="color:var(--mut)">Nenhum socio cadastrado</div>';
+  }
+  const table = document.getElementById('soc-aportes-body');
+  if (table) {
+    table.innerHTML = aportes.map(a => `<tr><td style="white-space:nowrap">${formatDateBr(a.data)}</td><td>${escapeHtml(a.socio || '—')}</td><td><span class="tag tag-gray">${escapeHtml(a.tipo || '—')}</span></td><td style="font-weight:600;color:var(--grn);white-space:nowrap">${fmt(toNum(a.valor) || 0)}</td><td>${escapeHtml(a.descricao || '—')}</td><td><span class="tag ${getAporteStatusClass(a.status)}">${formatAporteStatus(a.status)}</span></td><td>${renderAporteDocRef(a.doc_ref)}</td><td><span class="tag tag-blu">${escapeHtml(a.origem || '—')}</span></td></tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--mut);padding:20px">Nenhum aporte registrado</td></tr>';
+  }
+}
+const DOCUMENTOS_FALLBACK = [
+  {doc_id:'doc_ccv',categoria:'Contrato',documento:'CCV assinado',exigido_por:'CEF / Projeto',responsavel:'Gabriel Acioly',status:'concluido',prioridade:'alta',prazo:'',recebido_em:'2026-04-28',doc_ref:'',obs:'Contrato de compra e venda assinado'},
+  {doc_id:'doc_protocolo_cef',categoria:'CEF',documento:'Protocolo financiamento CEF',exigido_por:'CEF',responsavel:'Gabriel Acioly',status:'pendente',prioridade:'critica',prazo:'2026-05-12',recebido_em:'',doc_ref:'',obs:'Prazo critico contratual'},
+  {doc_id:'doc_pci',categoria:'Projeto',documento:'PCI / Planilha CEF',exigido_por:'CEF',responsavel:'',status:'pendente',prioridade:'critica',prazo:'',recebido_em:'',doc_ref:'',obs:''},
+  {doc_id:'doc_alvara',categoria:'Prefeitura',documento:'Alvara de construcao',exigido_por:'Prefeitura / CEF',responsavel:'',status:'pendente',prioridade:'alta',prazo:'',recebido_em:'',doc_ref:'',obs:''},
+  {doc_id:'doc_aprovacao_condominio',categoria:'Condominio',documento:'Aprovacao Alphaville CG4',exigido_por:'Condominio',responsavel:'',status:'pendente',prioridade:'alta',prazo:'',recebido_em:'',doc_ref:'',obs:''}
+];
+
+function getDocumentosRows() {
+  const rows = getDocumentos().length ? getDocumentos() : DOCUMENTOS_FALLBACK;
+  return rows.slice().map((r, idx) => ({
+    doc_id: r.doc_id || ('doc_' + idx),
+    categoria: r.categoria || '',
+    documento: r.documento || r.nome || '',
+    exigido_por: r.exigido_por || '',
+    responsavel: r.responsavel || '',
+    status: r.status || 'pendente',
+    prioridade: r.prioridade || 'media',
+    prazo: r.prazo || '',
+    recebido_em: r.recebido_em || r.data_recebimento || '',
+    validade: r.validade || '',
+    doc_ref: r.doc_ref || r.link || '',
+    obs: r.obs || ''
+  })).sort((a,b) => {
+    const pr = {critica:0, alta:1, media:2, baixa:3};
+    const pa = pr[normalizeStatus(a.prioridade)] ?? 9;
+    const pb = pr[normalizeStatus(b.prioridade)] ?? 9;
+    if (pa !== pb) return pa - pb;
+    return String(a.documento).localeCompare(String(b.documento), 'pt-BR');
+  });
+}
+
+function formatDateBr(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '—';
+  const m = raw.slice(0, 10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : escapeHtml(raw);
+}
+
+function formatDocStatus(status) {
+  const s = normalizeStatus(status);
+  const labels = {pendente:'Pendente',recebido:'Recebido',concluido:'Concluido',aprovado:'Aprovado',vencido:'Vencido',dispensado:'Dispensado',em_analise:'Em analise','em analise':'Em analise'};
+  return labels[s] || escapeHtml(status || 'Pendente');
+}
+
+function getDocStatusTagClass(status) {
+  const s = normalizeStatus(status);
+  if (s === 'concluido' || s === 'recebido' || s === 'aprovado') return 'tag-grn';
+  if (s === 'em_analise' || s === 'em analise') return 'tag-ylw';
+  if (s === 'vencido' || s === 'travado') return 'tag-red';
+  if (s === 'dispensado') return 'tag-blu';
+  return 'tag-gray';
+}
+
+function getPrioridadeTagClass(prioridade) {
+  const p = normalizeStatus(prioridade);
+  if (p === 'critica') return 'tag-red';
+  if (p === 'alta') return 'tag-ylw';
+  if (p === 'baixa') return 'tag-blu';
+  return 'tag-gray';
+}
+
+function formatPrioridade(prioridade) {
+  const p = normalizeStatus(prioridade);
+  if (p === 'critica') return 'Critica';
+  if (p === 'alta') return 'Alta';
+  if (p === 'baixa') return 'Baixa';
+  return 'Media';
+}
+
+function calcDocumentosResumo(rows) {
+  const doneStatuses = ['concluido','recebido','aprovado','dispensado'];
+  const total = rows.length;
+  const concluidos = rows.filter(r => doneStatuses.includes(normalizeStatus(r.status))).length;
+  const pendentes = rows.filter(r => !doneStatuses.includes(normalizeStatus(r.status))).length;
+  const criticos = rows.filter(r => normalizeStatus(r.prioridade) === 'critica' && !doneStatuses.includes(normalizeStatus(r.status))).length;
+  const comLink = rows.filter(r => safeUrl(r.doc_ref)).length;
+  return {total, concluidos, pendentes, criticos, com_link: comLink, percentual: total ? (concluidos / total) * 100 : 0};
+}
+
+function renderDocumentos() {
+  const rows = getDocumentosRows();
+  const resumo = calcDocumentosResumo(rows);
+  const pct = Math.round(resumo.percentual);
+  const kpis = document.getElementById('doc-kpis');
+  if (kpis) {
+    kpis.innerHTML = `
+      <div class="kpi"><div class="kpi-lbl">Total</div><div class="kpi-val">${resumo.total}</div><div class="kpi-sub">Documentos mapeados</div></div>
+      <div class="kpi kpi-grn"><div class="kpi-lbl">Concluidos</div><div class="kpi-val">${resumo.concluidos}</div><div class="kpi-sub">${pct}% do total</div></div>
+      <div class="kpi kpi-ylw"><div class="kpi-lbl">Pendentes</div><div class="kpi-val">${resumo.pendentes}</div><div class="kpi-sub">A acompanhar</div></div>
+      <div class="kpi ${resumo.criticos ? 'kpi-red' : 'kpi-grn'}"><div class="kpi-lbl">Criticos abertos</div><div class="kpi-val">${resumo.criticos}</div><div class="kpi-sub">Prioridade critica</div></div>
+      <div class="kpi kpi-blu"><div class="kpi-lbl">Com arquivo</div><div class="kpi-val">${resumo.com_link}</div><div class="kpi-sub">Links validos http/https</div></div>
+    `;
+  }
+  const table = document.getElementById('doc-table-body');
+  if (table) {
+    table.innerHTML = rows.map(r => `<tr>
+      <td><strong>${escapeHtml(r.documento || '—')}</strong></td>
+      <td><span class="tag tag-gray">${escapeHtml(r.categoria || '—')}</span></td>
+      <td>${escapeHtml(r.exigido_por || '—')}</td>
+      <td>${escapeHtml(r.responsavel || '—')}</td>
+      <td><span class="tag ${getDocStatusTagClass(r.status)}">${formatDocStatus(r.status)}</span></td>
+      <td><span class="tag ${getPrioridadeTagClass(r.prioridade)}">${formatPrioridade(r.prioridade)}</span></td>
+      <td style="white-space:nowrap">${formatDateBr(r.prazo)}</td>
+      <td style="white-space:nowrap">${formatDateBr(r.recebido_em)}</td>
+      <td>${renderDocRef(r.doc_ref)}</td>
+      <td>${emptyDash(r.obs)}</td>
+    </tr>`).join('') || '<tr><td colspan="10" style="text-align:center;color:var(--mut);padding:20px">Nenhum documento cadastrado</td></tr>';
+  }
+  const cards = document.getElementById('doc-cards');
+  if (cards) {
+    cards.innerHTML = rows.map(r => `<div class="card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff;line-height:1.35">${escapeHtml(r.documento || '—')}</div>
+          <div style="font-size:10px;color:var(--mut);margin-top:2px">${escapeHtml(r.categoria || '—')} · ${escapeHtml(r.exigido_por || '—')}</div>
+        </div>
+        <span class="tag ${getDocStatusTagClass(r.status)}">${formatDocStatus(r.status)}</span>
+      </div>
+      <div class="vrow"><span style="color:var(--mut)">Prioridade</span><span><span class="tag ${getPrioridadeTagClass(r.prioridade)}">${formatPrioridade(r.prioridade)}</span></span></div>
+      <div class="vrow"><span style="color:var(--mut)">Prazo</span><span>${formatDateBr(r.prazo)}</span></div>
+      <div class="vrow"><span style="color:var(--mut)">Responsavel</span><span>${escapeHtml(r.responsavel || '—')}</span></div>
+      <div class="vrow"><span style="color:var(--mut)">Arquivo</span><span>${renderDocRef(r.doc_ref)}</span></div>
+      ${r.obs ? `<div style="font-size:11px;color:var(--mut);line-height:1.4;margin-top:8px">${escapeHtml(r.obs)}</div>` : ''}
+    </div>`).join('');
+  }
+}
+function getMedicoesCefRows() {
+  const rows = getMedicoesCef().length ? getMedicoesCef() : MEDICOES_FALLBACK;
+  return rows.slice().map((r, idx) => ({
+    medicao_id: r.medicao_id || r.label || ('L' + idx),
+    ordem: Number.isFinite(parseInt(r.ordem)) ? parseInt(r.ordem) : idx,
+    label: r.label || r.medicao_id || ('L' + idx),
+    gatilho: r.gatilho || '',
+    percentual_obra: r.percentual_obra,
+    valor_previsto: toNum(r.valor_previsto) || 0,
+    valor_solicitado: toNum(r.valor_solicitado) || 0,
+    valor_liberado: toNum(r.valor_liberado) || 0,
+    data_prevista: r.data_prevista || '',
+    data_solicitada: r.data_solicitada || '',
+    data_liberada: r.data_liberada || '',
+    status: r.status || 'pendente',
+    pendencia: r.pendencia || '',
+    responsavel: r.responsavel || '',
+    doc_ref: r.doc_ref || '',
+    obs: r.obs || ''
+  })).sort((a,b) => a.ordem - b.ordem);
+}
+
+function calcMedicoesResumo(rows) {
+  const totalPrevisto = rows.reduce((s,r) => s + (toNum(r.valor_previsto) || 0), 0);
+  const totalSolicitado = rows.reduce((s,r) => s + (toNum(r.valor_solicitado) || 0), 0);
+  const totalLiberado = rows.reduce((s,r) => s + (toNum(r.valor_liberado) || 0), 0);
+  const qtdConcluidas = rows.filter(r => ['concluido','liberado'].includes(String(r.status || '').toLowerCase())).length;
+  const qtdPendentes = rows.filter(r => !r.status || String(r.status).toLowerCase() === 'pendente').length;
+  const qtdComPendencia = rows.filter(r => String(r.pendencia || '').trim()).length;
+  return {
+    total_previsto: totalPrevisto,
+    total_solicitado: totalSolicitado,
+    total_liberado: totalLiberado,
+    saldo_a_liberar: Math.max(0, totalPrevisto - totalLiberado),
+    qtd_concluidas: qtdConcluidas,
+    qtd_pendentes: qtdPendentes,
+    qtd_com_pendencia: qtdComPendencia,
+    percentual_liberado: totalPrevisto > 0 ? (totalLiberado / totalPrevisto) * 100 : 0
+  };
+}
+
+function normalizeStatus(status) {
+  return String(status || 'pendente').toLowerCase().trim();
+}
+
+function getStatusTagClass(status) {
+  const s = normalizeStatus(status);
+  if (s === 'concluido' || s === 'concluído' || s === 'liberado') return 'tag-grn';
+  if (s === 'solicitado' || s === 'em_analise' || s === 'em análise') return 'tag-ylw';
+  if (s === 'em andamento' || s === 'em_andamento') return 'tag-blu';
+  if (s === 'travado' || s === 'atrasado' || s === 'reprovado') return 'tag-red';
+  return 'tag-gray';
+}
+
+function formatMedicaoStatus(status) {
+  const s = normalizeStatus(status);
+  const labels = {
+    pendente:'Pendente',
+    solicitado:'Solicitado',
+    em_analise:'Em análise',
+    'em análise':'Em análise',
+    liberado:'Liberado',
+    concluido:'Concluído',
+    'concluído':'Concluído',
+    travado:'Travado',
+    atrasado:'Atrasado',
+    reprovado:'Reprovado',
+    em_andamento:'Em andamento',
+    'em andamento':'Em andamento'
+  };
+  return labels[s] || escapeHtml(status || 'Pendente');
+}
+
+function renderDocRef(link) {
+  const raw = String(link || '').trim();
+  if (!raw) return '<span style="color:var(--mut)">—</span>';
+  const url = safeUrl(raw);
+  if (url) return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color:var(--acc2);text-decoration:none">🔗 Ver</a>`;
+  return `<span style="color:var(--mut);font-size:10px">${escapeHtml(raw)}</span>`;
+}
+
+function medRowClass(row) {
+  const s = normalizeStatus(row.status);
+  if (s === 'liberado' || s === 'concluido' || s === 'concluído') return 'row-grn';
+  if (s === 'travado' || s === 'atrasado' || s === 'reprovado') return 'row-red';
+  return '';
+}
+
+function pctObraLabel(v) {
+  const n = toNum(v);
+  return n == null ? '—' : n + '%';
+}
+
+function emptyDash(v) {
+  return v === '' || v === null || v === undefined ? '—' : escapeHtml(v);
+}
+
+function markDashboardFallback(errorText) {
+  window.dashboardData = emptyDashboardData();
+  window.dashboardData.source = 'local_fallback';
+  window.dashboardData.error = errorText || null;
+  window.dashboardData.loaded = false;
+}
+
+function applyDashboardData(json, source) {
+  const payload = Object.assign({}, json || {}, {__source: source});
+  const data = normalizeDashboardPayload(payload);
+  window.dashboardData = data;
+
+  finData = data.pagamentos;
+  if (data.orcamento.length) {
+    orcCategories = parseOrcamento(data.orcamento);
+    window.orcBuilt = false;
+  }
+  if (data.desembolso.length) {
+    phases = parseDesembolso(data.desembolso);
+  }
+  if (data.checklist.length) {
+    checklists = parseChecklist(data.checklist);
+    buildChecklist();
+  }
+  allDataLoaded = true;
+  setFinStatus('Atualizado agora · ' + finData.length + ' registros · ' + sourceLabel(source));
+  refreshActiveViews();
+}
+
+function refreshActiveViews() {
+  if (document.getElementById('fin-content').style.display !== 'none') renderFinanceiro();
+  if (document.getElementById('panel-visao').classList.contains('active')) renderCockpit();
+  if (document.getElementById('panel-medicoes').classList.contains('active')) renderMedicoesCef();
+  if (document.getElementById('panel-documentos').classList.contains('active')) renderDocumentos();
+  if (document.getElementById('panel-socios').classList.contains('active')) renderSociosAportes();
+  if (document.getElementById('panel-riscos').classList.contains('active')) renderRiscosAcoes();
+  if (document.getElementById('panel-desembolso').classList.contains('active')) {
+    clearTimeout(window._chartT); window._chartT = setTimeout(buildDesembolsoChart, 150);
+  }
+  if (document.getElementById('panel-orcamento').classList.contains('active')) {
+    window.orcBuilt = false; buildOrcamento();
+  }
+}
+
+function initDashboardData() {
+  finApiUrl = localStorage.getItem(FIN_URL_KEY) || '';
+  if (finApiUrl) loadAllData({background:true});
+}
+
+function loadAllData(opts = {}) {
+  if (!finApiUrl) {
+    setFinStatus(errorMessage(null));
+    return;
+  }
+  if (allDataLoading) return;
+  allDataLoading = true;
+  if (!opts.background) setFinStatus('Carregando dados…');
+  gsFetch(finApiUrl + '?action=read_dashboard', function(json) {
+    if (json && json.ok && Array.isArray(json.pagamentos)) {
+      allDataLoading = false;
+      applyDashboardData(json, 'read_dashboard');
       return;
     }
-    finData = Array.isArray(json.pagamentos) ? json.pagamentos : [];
-    document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
-    if (Array.isArray(json.orcamento) && json.orcamento.length) {
-      orcCategories = parseOrcamento(json.orcamento);
-      window.orcBuilt = false;
-    }
-    if (Array.isArray(json.desembolso) && json.desembolso.length) {
-      phases = parseDesembolso(json.desembolso);
-    }
-    if (Array.isArray(json.checklist) && json.checklist.length) {
-      checklists = parseChecklist(json.checklist);
-      buildChecklist();
-    }
-    renderFinanceiro();
-    if (document.getElementById('panel-desembolso').classList.contains('active')) {
-      clearTimeout(window._chartT); window._chartT = setTimeout(buildDesembolsoChart, 150);
-    }
-    if (document.getElementById('panel-orcamento').classList.contains('active')) {
-      window.orcBuilt = false; buildOrcamento();
-    }
+    loadLegacyAllData(opts, json);
   });
+}
+
+function loadLegacyAllData(opts = {}, firstError) {
+  gsFetch(finApiUrl + '?action=read_all', function(json) {
+    allDataLoading = false;
+    if (!json || !json.ok) {
+      markDashboardFallback(errorMessage(firstError || json, 'Erro ao carregar. Mantendo dados locais.'));
+      setFinStatus(errorMessage(firstError || json, 'Erro ao carregar. Mantendo dados locais.') + ' · fallback local');
+      allDataLoaded = false;
+      return;
+    }
+    if (!Array.isArray(json.pagamentos)) {
+      markDashboardFallback('Resposta inválida do Apps Script.');
+      setFinStatus(errorMessage({error_code:'INVALID_RESPONSE'}, 'Resposta inválida do Apps Script.'));
+      allDataLoaded = false;
+      return;
+    }
+    applyDashboardData(json, 'read_all');
+  });
+}
+
+function renderMedicoesCef() {
+  const rows = getMedicoesCefRows();
+  const resumo = calcMedicoesResumo(rows);
+  const pct = Math.max(0, Math.min(100, resumo.percentual_liberado));
+
+  const kpis = document.getElementById('med-kpis');
+  if (kpis) {
+    kpis.innerHTML = `
+      <div class="kpi kpi-blu"><div class="kpi-lbl">Total previsto CEF</div><div class="kpi-val">${fmt(resumo.total_previsto)}</div><div class="kpi-sub">L0 a L6</div></div>
+      <div class="kpi kpi-ylw"><div class="kpi-lbl">Total solicitado</div><div class="kpi-val">${fmt(resumo.total_solicitado)}</div><div class="kpi-sub">Em análise/liberação</div></div>
+      <div class="kpi kpi-grn"><div class="kpi-lbl">Total liberado</div><div class="kpi-val">${fmt(resumo.total_liberado)}</div><div class="kpi-sub">${resumo.qtd_concluidas} medições liberadas</div></div>
+      <div class="kpi"><div class="kpi-lbl">Saldo a liberar</div><div class="kpi-val">${fmt(resumo.saldo_a_liberar)}</div><div class="kpi-sub">${resumo.qtd_pendentes} pendentes</div></div>
+      <div class="kpi kpi-blu"><div class="kpi-lbl">% liberado</div><div class="kpi-val">${pct.toFixed(1).replace('.', ',')}%</div><div class="kpi-sub">Sobre total previsto</div></div>
+      <div class="kpi ${resumo.qtd_com_pendencia ? 'kpi-red' : 'kpi-grn'}"><div class="kpi-lbl">Com pendência</div><div class="kpi-val">${resumo.qtd_com_pendencia}</div><div class="kpi-sub">Itens com observação crítica</div></div>
+    `;
+  }
+
+  const progressLabel = document.getElementById('med-progress-label');
+  const progressBar = document.getElementById('med-progress-bar');
+  if (progressLabel) progressLabel.textContent = pct.toFixed(1).replace('.', ',') + '%';
+  if (progressBar) progressBar.style.width = pct + '%';
+
+  const table = document.getElementById('med-table-body');
+  if (table) {
+    table.innerHTML = rows.map(r => {
+      const previsto = toNum(r.valor_previsto) || 0;
+      const solicitado = toNum(r.valor_solicitado) || 0;
+      const liberado = toNum(r.valor_liberado) || 0;
+      const saldo = Math.max(0, previsto - liberado);
+      const pend = String(r.pendencia || '').trim();
+      return `<tr class="${medRowClass(r)}">
+        <td><strong>${escapeHtml(r.label)}</strong></td>
+        <td>${escapeHtml(r.gatilho || '—')}</td>
+        <td>${pctObraLabel(r.percentual_obra)}</td>
+        <td>${fmt(previsto)}</td>
+        <td>${solicitado ? fmt(solicitado) : '<span class="val-empty">—</span>'}</td>
+        <td>${liberado ? `<span class="val-real">${fmt(liberado)}</span>` : '<span class="val-empty">—</span>'}</td>
+        <td>${fmt(saldo)}</td>
+        <td><span class="tag ${getStatusTagClass(r.status)}">${formatMedicaoStatus(r.status)}</span></td>
+        <td>${pend ? `<span class="tag tag-red">${escapeHtml(pend)}</span>` : '<span class="val-empty">—</span>'}</td>
+        <td>${emptyDash(r.responsavel)}</td>
+        <td>${renderDocRef(r.doc_ref)}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="11" style="text-align:center;color:var(--mut);padding:20px">Nenhuma medição cadastrada</td></tr>';
+  }
+
+  const cards = document.getElementById('med-cards');
+  if (cards) {
+    cards.innerHTML = rows.map(r => {
+      const previsto = toNum(r.valor_previsto) || 0;
+      const liberado = toNum(r.valor_liberado) || 0;
+      const pend = String(r.pendencia || '').trim();
+      return `<div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+          <div style="font-size:15px;font-weight:700;color:#fff">${escapeHtml(r.label)}</div>
+          <span class="tag ${getStatusTagClass(r.status)}">${formatMedicaoStatus(r.status)}</span>
+        </div>
+        <div style="font-size:11px;color:var(--mut);line-height:1.4;margin-bottom:8px">${escapeHtml(r.gatilho || '—')}</div>
+        <div class="vrow"><span style="color:var(--mut)">Previsto</span><span>${fmt(previsto)}</span></div>
+        <div class="vrow"><span style="color:var(--mut)">Liberado</span><span style="color:${liberado ? 'var(--grn)' : 'var(--mut)'}">${liberado ? fmt(liberado) : '—'}</span></div>
+        ${pend ? `<div style="margin-top:8px"><span class="tag tag-red">${escapeHtml(pend)}</span></div>` : ''}
+      </div>`;
+    }).join('');
+  }
 }
 function renderFinanceiro() {
   const saidas   = finData.filter(r => r.tipo === 'SAIDA');
@@ -754,17 +1767,15 @@ function renderFinTable() {
   const rows = filtered.slice().reverse().map(r => {
     const isSaida = r.tipo === 'SAIDA';
     const dataStr = String(r.data || '').slice(0, 10);
-    const dataFmt = dataStr ? dataStr.split('-').reverse().join('/') : '—';
-    const docCell = r.doc_ref
-      ? (r.doc_ref.startsWith('http') ? `<a href="${r.doc_ref}" target="_blank" style="color:var(--acc2);text-decoration:none">🔗 Ver</a>` : `<span style="color:var(--mut);font-size:10px">${r.doc_ref}</span>`)
-      : '<span style="color:var(--mut)">—</span>';
+    const dataFmt = escapeHtml(dataStr ? dataStr.split('-').reverse().join('/') : '—');
+    const docCell = safeDocCell(r.doc_ref);
     return `<tr>
       <td style="white-space:nowrap">${dataFmt}</td>
       <td><span class="tag ${isSaida ? 'tag-red' : 'tag-grn'}">${isSaida ? '↑ SAÍDA' : '↓ ENTRADA'}</span></td>
-      <td>${r.descricao || '—'}</td>
-      <td><span class="tag tag-gray">${r.categoria || '—'}</span></td>
+      <td>${escapeHtml(r.descricao || '—')}</td>
+      <td><span class="tag tag-gray">${escapeHtml(r.categoria || '—')}</span></td>
       <td style="font-weight:600;color:${isSaida ? 'var(--red)' : 'var(--grn)'};white-space:nowrap">${isSaida ? '−' : '+'}${fmt(parseFloat(r.valor) || 0)}</td>
-      <td style="color:var(--mut)">${r.de_para || '—'}</td>
+      <td style="color:var(--mut)">${escapeHtml(r.de_para || '—')}</td>
       <td>${docCell}</td>
     </tr>`;
   }).join('');
@@ -829,11 +1840,12 @@ function submitPayment() {
   gsFetch(finApiUrl + '?' + params.toString(), function(json) {
     if (json && json.ok) {
       finData = Array.isArray(json.data) ? json.data : finData;
+      allDataLoaded = false;
       closePaymentForm();
       renderFinanceiro();
-      document.getElementById('fin-status').textContent = 'Atualizado agora · ' + finData.length + ' registros';
+      setFinStatus('Atualizado agora · ' + finData.length + ' registros');
     } else {
-      alert('Erro ao enviar. Verifique a URL do Apps Script.');
+      alert(errorMessage(json, 'Erro ao enviar. Verifique a URL do Apps Script.'));
     }
     btn.disabled = false;
     btn.textContent = 'Registrar';
@@ -907,15 +1919,16 @@ function renderOrcTables() {
     const hasCot=cat.items.some(i=>i.cot!=null);
     const sec=document.createElement('div');
     sec.className='orc-section';
-    let html=`<div class="orc-cat">${cat.label}<span style="font-size:11px;color:var(--mut);font-weight:400">Orçado ${fmt(catOrc)}${hasCot?' · Cotado '+fmt(catCot):''}</span></div>`;
+    let html=`<div class="orc-cat">${escapeHtml(cat.label)}<span style="font-size:11px;color:var(--mut);font-weight:400">Orçado ${fmt(catOrc)}${hasCot?' · Cotado '+fmt(catCot):''}</span></div>`;
     html+=`<div class="orc-table"><table><thead><tr><th style="min-width:220px">Item</th><th>Orçado</th><th>Cotado</th><th>Δ Cotado</th><th>Real (Pago)</th><th>Situação</th></tr></thead><tbody>`;
     cat.items.forEach(it=>{
       const delta=it.cot!=null?it.cot-it.orc:null;
       const rowCls=it.real!=null?'':(delta!=null?(delta<0?'row-grn':'row-red'):'');
       const sitTag=it.real!=null?'<span class="tag tag-grn">Pago ✓</span>':it.cot!=null?(delta<0?'<span class="tag tag-grn">Cotado ↓</span>':'<span class="tag tag-red">Cotado ↑</span>'):'<span class="tag tag-gray">Sem cotação</span>';
-      html+=`<tr class="${rowCls}"><td><div style="font-weight:500">${it.desc}</div>${it.obs?`<div class="orc-obs">${it.obs}</div>`:''}</td><td>${fmt(it.orc)}</td><td>${it.cot!=null?`<strong>${fmt(it.cot)}</strong>`:'<span class="val-empty">aguardando</span>'}</td><td>${fmtD(delta)}</td><td>${it.real!=null?`<span class="val-real">${fmt(it.real)}</span>`:'<span class="val-empty">—</span>'}</td><td>${sitTag}</td></tr>`;
+      html+=`<tr class="${rowCls}"><td><div style="font-weight:500">${escapeHtml(it.desc)}</div>${it.obs?`<div class="orc-obs">${escapeHtml(it.obs)}</div>`:''}</td><td>${fmt(it.orc)}</td><td>${it.cot!=null?`<strong>${fmt(it.cot)}</strong>`:'<span class="val-empty">aguardando</span>'}</td><td>${fmtD(delta,it.orc)}</td><td>${it.real!=null?`<span class="val-real">${fmt(it.real)}</span>`:'<span class="val-empty">—</span>'}</td><td>${sitTag}</td></tr>`;
     });
-    html+=`<tr class="row-total"><td>SUBTOTAL</td><td>${fmt(catOrc)}</td><td>${hasCot?fmt(catCot):'<span class="val-empty">parcial</span>'}</td><td>${hasCot?fmtD(catCot-cat.items.filter(i=>i.cot!=null).reduce((s,i)=>s+i.orc,0)):'<span class="delta-neu">—</span>'}</td><td>${catReal>0?`<span class="val-real">${fmt(catReal)}</span>`:'<span class="val-empty">—</span>'}</td><td></td></tr>`;
+    const catCotBase=cat.items.filter(i=>i.cot!=null).reduce((s,i)=>s+i.orc,0);
+    html+=`<tr class="row-total"><td>SUBTOTAL</td><td>${fmt(catOrc)}</td><td>${hasCot?fmt(catCot):'<span class="val-empty">parcial</span>'}</td><td>${hasCot?fmtD(catCot-catCotBase,catCotBase):'<span class="delta-neu">—</span>'}</td><td>${catReal>0?`<span class="val-real">${fmt(catReal)}</span>`:'<span class="val-empty">—</span>'}</td><td></td></tr>`;
     html+=`</tbody></table></div>`;
     sec.innerHTML=html;
     container.appendChild(sec);
@@ -984,7 +1997,7 @@ function buildDesembolsoChart(){
       datasets:[
         {type:'bar',label:'🟠 Recursos Próprios',data:phases.map(p=>p.proprio),backgroundColor:'rgba(249,115,22,0.75)',borderColor:'rgba(249,115,22,1)',borderWidth:1,borderRadius:4,yAxisID:'y'},
         {type:'bar',label:'🔵 Via CEF',data:phases.map(p=>p.cef),backgroundColor:'rgba(91,106,247,0.75)',borderColor:'rgba(91,106,247,1)',borderWidth:1,borderRadius:4,yAxisID:'y'},
-        {type:'line',label:'📈 Acumulado',data:(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;})();}()),borderColor:'rgba(34,197,94,0.9)',backgroundColor:'rgba(34,197,94,0.1)',borderWidth:2,pointRadius:4,fill:false,tension:0.3,yAxisID:'y2'}
+        {type:'line',label:'📈 Acumulado',data:(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;});}()),borderColor:'rgba(34,197,94,0.9)',backgroundColor:'rgba(34,197,94,0.1)',borderWidth:2,pointRadius:4,fill:false,tension:0.3,yAxisID:'y2'}
       ]
     },
     options:{
@@ -1007,9 +2020,9 @@ function setFilter(f,btn){
   btn.classList.add('active');
   if(desembolsoChart){
     const ds=desembolsoChart.data.datasets;
-    if(f==='all'){ds[0].data=phases.map(p=>p.proprio);ds[1].data=phases.map(p=>p.cef);ds[0].hidden=false;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;})();}());}
-    else if(f==='prop'){ds[0].data=phases.map(p=>p.proprio);ds[1].hidden=true;ds[0].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio;return a;})();}());}
-    else{ds[1].data=phases.map(p=>p.cef);ds[0].hidden=true;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.cef;return a;})();}());}
+    if(f==='all'){ds[0].data=phases.map(p=>p.proprio);ds[1].data=phases.map(p=>p.cef);ds[0].hidden=false;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio+p.cef;return a;});}());}
+    else if(f==='prop'){ds[0].data=phases.map(p=>p.proprio);ds[1].hidden=true;ds[0].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.proprio;return a;});}());}
+    else{ds[1].data=phases.map(p=>p.cef);ds[0].hidden=true;ds[1].hidden=false;ds[2].data=(function(){let a=0;return phases.map(p=>{a+=p.cef;return a;});}());}
     desembolsoChart.update();
   }
   buildFaseContainer(f);
@@ -1025,13 +2038,13 @@ function buildFaseContainer(f){
     const div=document.createElement('div');
     div.className='phase-section';
     div.innerHTML=`<div class="phase-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
-      <div class="phase-hdr-l"><span style="font-size:11px;background:var(--sur2);padding:2px 8px;border-radius:10px;color:var(--mut)">${pi+1}</span>${ph.label}${ph.urgente?' ⚠️':''}<span style="font-size:10px;color:var(--mut);font-weight:400">${ph.sub}</span></div>
+      <div class="phase-hdr-l"><span style="font-size:11px;background:var(--sur2);padding:2px 8px;border-radius:10px;color:var(--mut)">${pi+1}</span>${escapeHtml(ph.label)}${ph.urgente?' ⚠️':''}<span style="font-size:10px;color:var(--mut);font-weight:400">${escapeHtml(ph.sub)}</span></div>
       <div class="phase-hdr-r">${ph.proprio>0&&(f==='all'||f==='prop')?`<span style="color:var(--org)">${fmtV(ph.proprio)} próprio</span>`:''}${ph.cef>0&&(f==='all'||f==='cef')?`<span style="color:var(--acc2)">${fmtV(ph.cef)} CEF</span>`:''}<span style="color:var(--mut)">▼</span></div>
     </div>
     <div class="phase-body">${items.map(it=>`<div class="detalhe-item">
       <div class="d-dot ${it.t==='prop'?'d-prop':'d-cef'}"></div>
-      <div style="flex:1"><div class="d-desc">${it.desc}</div></div>
-      <div class="d-quando">${it.quando}</div>
+      <div style="flex:1"><div class="d-desc">${escapeHtml(it.desc)}</div></div>
+      <div class="d-quando">${escapeHtml(it.quando)}</div>
       <div style="margin-left:8px">${it.status==='pago'?'<span class="tag tag-grn">Pago ✓</span>':it.status==='urgente'?'<span class="tag tag-red">Urgente</span>':'<span class="tag tag-gray">Pendente</span>'}</div>
       <div class="d-val" style="margin-left:10px;color:${it.t==='prop'?'var(--org)':'var(--acc2)'}">${fmtV(it.val)}</div>
     </div>`).join('')}
@@ -1095,17 +2108,19 @@ function buildChecklist() {
   checklists.forEach((gr, gi) => {
     const grp = document.createElement('div'); grp.className = 'cbox';
     const hdr = document.createElement('div'); hdr.className = 'cbox-hdr';
-    hdr.innerHTML = '<div class="cbox-hdr-l"><span style="width:10px;height:10px;border-radius:50%;background:' + gr.color + ';display:inline-block"></span>' + gr.title + '</div><span id="gc' + gi + '" style="font-size:11px;color:var(--mut)"></span>';
+    hdr.innerHTML = '<div class="cbox-hdr-l"><span style="width:10px;height:10px;border-radius:50%;background:' + safeCssColor(gr.color) + ';display:inline-block"></span>' + escapeHtml(gr.title) + '</div><span id="gc' + gi + '" style="font-size:11px;color:var(--mut)"></span>';
     hdr.onclick = () => { const b = grp.querySelector('.cbox-body'); b.style.display = b.style.display === 'none' ? '' : 'none'; };
     const body = document.createElement('div'); body.className = 'cbox-body';
     gr.items.forEach((it, ii) => {
       totalCk++;
+      const realGi = Number.isFinite(it.gi) ? it.gi : gi;
+      const realIi = Number.isFinite(it.ii) ? it.ii : ii;
       const key = gi + '-' + ii;
       const isDone = cstate[key] !== undefined ? cstate[key] : it.done;
       const el = document.createElement('div'); el.className = 'citem';
       el.innerHTML = '<div class="cb ' + (isDone ? 'checked' : '') + '" id="cb' + gi + ii + '"></div>' +
-        '<div><div class="ctext" style="' + (isDone ? 'text-decoration:line-through;opacity:.55' : '') + '" id="ct' + gi + ii + '">' + it.text + '</div>' +
-        (it.sub ? '<div class="csub">' + it.sub + '</div>' : '') + '</div>';
+        '<div><div class="ctext" style="' + (isDone ? 'text-decoration:line-through;opacity:.55' : '') + '" id="ct' + gi + ii + '">' + escapeHtml(it.text) + '</div>' +
+        (it.sub ? '<div class="csub">' + escapeHtml(it.sub) + '</div>' : '') + '</div>';
       el.onclick = () => {
         const cb = document.getElementById('cb' + gi + ii);
         const ct = document.getElementById('ct' + gi + ii);
@@ -1116,7 +2131,8 @@ function buildChecklist() {
         const newState = !was;
         cstate[key] = newState; updateCkProgress(); updateGc(gi);
         if (finApiUrl) {
-          gsFetch(finApiUrl + '?action=update_checklist&gi=' + gi + '&ii=' + ii + '&done=' + newState, function() {});
+          const params = new URLSearchParams({action:'update_checklist', gi:realGi, ii:realIi, done:newState});
+          gsFetch(finApiUrl + '?' + params.toString(), function() {});
         }
       };
       body.appendChild(el);
@@ -1141,6 +2157,8 @@ function updateCkProgress() {
   document.getElementById('check-bar').style.width = pct + '%';
 }
 buildChecklist();
+renderCockpit();
+initDashboardData();
 </script>
 </body>
 </html>
